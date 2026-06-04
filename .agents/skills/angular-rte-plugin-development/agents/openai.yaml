@@ -1,0 +1,4 @@
+interface:
+  display_name: 'Angular RTE Plugin Development'
+  short_description: 'Build Angular RTE plugins end to end'
+  default_prompt: 'Implement a new Angular RTE plugin using the repository plugin workflow.'
