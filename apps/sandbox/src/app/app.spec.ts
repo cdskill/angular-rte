@@ -4,6 +4,7 @@ import {
   CODE_BLOCK_PLUGIN_DEFAULT_OPTIONS,
   ClearFormattingPlugin,
   CodeBlockPlugin,
+  HardBreakPlugin,
   HEADINGS_PLUGIN_DEFAULT_OPTIONS,
   HeadingsPlugin,
   HISTORY_PLUGIN_DEFAULT_OPTIONS,
@@ -209,6 +210,122 @@ describe('App', () => {
     expect(editor.execute('clearFormatting')).toBeTrue();
     expect(editor.html()).toBe('<p>const answer = 42;</p>');
     expect(editor.isCommandActive('toggleCodeBlock')).toBeFalse();
+
+    editor.unmount(host);
+  });
+
+  it('should expose hard break commands through the public plugin', () => {
+    const editor = createRteEditor({
+      content: '<p>Angular RTE</p>',
+      plugins: [HardBreakPlugin],
+    });
+    const host = document.createElement('div');
+
+    editor.mount(host);
+
+    expect(HardBreakPlugin.key).toBe('hardBreak');
+    expect(editor.canExecute('insertHardBreak')).toBeTrue();
+    expect(editor.execute('insertHardBreak')).toBeTrue();
+    expect(editor.html()).toBe('<p><br>Angular RTE</p>');
+
+    editor.unmount(host);
+  });
+
+  it('should parse serialized hard breaks through the public plugin', () => {
+    const editor = createRteEditor({
+      content: '<p>Line one<br>Line two</p>',
+      plugins: [HardBreakPlugin],
+    });
+    const host = document.createElement('div');
+
+    editor.mount(host);
+
+    expect(editor.html()).toBe('<p>Line one<br>Line two</p>');
+
+    editor.unmount(host);
+  });
+
+  it('should insert hard breaks with Shift+Enter', () => {
+    const editor = createRteEditor({
+      content: '<p>Angular RTE</p>',
+      plugins: [HardBreakPlugin],
+    });
+    const host = document.createElement('div');
+
+    editor.mount(host);
+
+    const surface = host.querySelector('.ProseMirror');
+    const shiftEnterEvent = new KeyboardEvent('keydown', {
+      bubbles: true,
+      cancelable: true,
+      key: 'Enter',
+      shiftKey: true,
+    });
+
+    surface?.dispatchEvent(shiftEnterEvent);
+
+    expect(shiftEnterEvent.defaultPrevented).toBeTrue();
+    expect(editor.html()).toBe('<p><br>Angular RTE</p>');
+
+    editor.unmount(host);
+  });
+
+  it('should keep Shift+Enter out of code blocks', () => {
+    const editor = createRteEditor({
+      content:
+        '<pre><code class="language-typescript">const answer = 42;</code></pre>',
+      plugins: [
+        CodeBlockPlugin.configure({
+          languages: ['plaintext', 'typescript'],
+          defaultLanguage: 'typescript',
+        }),
+        HardBreakPlugin,
+      ],
+    });
+    const host = document.createElement('div');
+
+    editor.mount(host);
+
+    const surface = host.querySelector('.ProseMirror');
+    const shiftEnterEvent = new KeyboardEvent('keydown', {
+      bubbles: true,
+      cancelable: true,
+      key: 'Enter',
+      shiftKey: true,
+    });
+
+    surface?.dispatchEvent(shiftEnterEvent);
+
+    expect(shiftEnterEvent.defaultPrevented).toBeFalse();
+    expect(editor.canExecute('insertHardBreak')).toBeFalse();
+    expect(editor.html()).toBe(
+      '<pre><code class="language-typescript">const answer = 42;</code></pre>',
+    );
+
+    editor.unmount(host);
+  });
+
+  it('should preserve code block line breaks when clearing formatting with hard breaks enabled', () => {
+    const editor = createRteEditor({
+      content:
+        '<pre><code class="language-typescript">const first = 1;&#10;const second = 2;</code></pre>',
+      plugins: [
+        CodeBlockPlugin.configure({
+          languages: ['plaintext', 'typescript'],
+          defaultLanguage: 'typescript',
+        }),
+        HardBreakPlugin,
+        ClearFormattingPlugin,
+      ],
+    });
+    const host = document.createElement('div');
+
+    editor.mount(host);
+
+    expect(editor.execute('clearFormatting')).toBeTrue();
+    expect(editor.html()).toBe(
+      '<p>const first = 1;<br>const second = 2;</p>',
+    );
 
     editor.unmount(host);
   });

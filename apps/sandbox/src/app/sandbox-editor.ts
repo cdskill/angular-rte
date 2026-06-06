@@ -3,6 +3,7 @@ import {
   BlockquotePlugin,
   ClearFormattingPlugin,
   CodeBlockPlugin,
+  HardBreakPlugin,
   HeadingsPlugin,
   HistoryPlugin,
   LinkPlugin,
@@ -81,6 +82,7 @@ export class SandboxEditor {
         languages: SANDBOX_CODE_BLOCK_LANGUAGE_VALUES,
         defaultLanguage: SANDBOX_DEFAULT_CODE_BLOCK_LANGUAGE,
       }),
+      HardBreakPlugin,
       ClearFormattingPlugin,
       SandboxCodeHighlightPlugin,
       HistoryPlugin.configure({
