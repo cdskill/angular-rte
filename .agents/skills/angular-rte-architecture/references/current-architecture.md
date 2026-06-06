@@ -43,6 +43,7 @@ an explicit escape hatch.
 An `RtePlugin` has a unique `key` and can contribute:
 
 - `nodes`
+- `extendNodes(nodes)`
 - `marks`
 - `commands(schema)`
 - `commandStates(schema)`

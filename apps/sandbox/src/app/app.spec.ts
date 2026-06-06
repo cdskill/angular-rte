@@ -11,8 +11,12 @@ import {
   HistoryPlugin,
   LINK_PLUGIN_DEFAULT_OPTIONS,
   LinkPlugin,
+  ListsPlugin,
+  TEXT_ALIGN_PLUGIN_DEFAULT_OPTIONS,
+  TextAlignPlugin,
   TextFormattingKit,
   createRteEditor,
+  createRtePlugin,
 } from '@angular-rte/editor';
 
 import { App } from './app';
@@ -34,9 +38,14 @@ describe('App', () => {
       'ProseMirror editor foundation',
     );
     expect(compiled.querySelectorAll('[role="toolbar"] button')).toHaveLength(
-      19,
+      23,
     );
-    expect(compiled.querySelector('[aria-label="Clear formatting"]')).not.toBeNull();
+    expect(
+      compiled.querySelector('[aria-label="Clear formatting"]'),
+    ).not.toBeNull();
+    expect(
+      compiled.querySelector('[aria-label="Align center"]'),
+    ).not.toBeNull();
     expect(compiled.querySelector('[aria-label="Link URL"]')).toBeNull();
     expect(compiled.querySelector('.ProseMirror')?.textContent).toContain(
       'Angular RTE',
@@ -60,8 +69,9 @@ describe('App', () => {
       compiled.querySelector('.ProseMirror code.language-go')?.textContent,
     ).toContain('fmt.Println');
     expect(
-      compiled.querySelector('.ProseMirror code.language-typescript .hljs-keyword')
-        ?.textContent,
+      compiled.querySelector(
+        '.ProseMirror code.language-typescript .hljs-keyword',
+      )?.textContent,
     ).toContain('import');
     expect(
       compiled.querySelector('.ProseMirror code.language-go .hljs-keyword')
@@ -323,9 +333,7 @@ describe('App', () => {
     editor.mount(host);
 
     expect(editor.execute('clearFormatting')).toBeTrue();
-    expect(editor.html()).toBe(
-      '<p>const first = 1;<br>const second = 2;</p>',
-    );
+    expect(editor.html()).toBe('<p>const first = 1;<br>const second = 2;</p>');
 
     editor.unmount(host);
   });
@@ -366,7 +374,8 @@ describe('App', () => {
 
   it('should keep Tab inside code blocks for indentation', () => {
     const editor = createRteEditor({
-      content: '<pre><code class="language-typescript">const answer = 42;</code></pre>',
+      content:
+        '<pre><code class="language-typescript">const answer = 42;</code></pre>',
       plugins: [
         CodeBlockPlugin.configure({
           languages: ['plaintext', 'typescript'],
@@ -475,6 +484,113 @@ describe('App', () => {
     expect(editor.html()).toBe('<p>Quoted text</p>');
 
     editor.unmount(host);
+  });
+
+  it('should expose text alignment through the public plugin', () => {
+    const editor = createRteEditor({
+      content: '<p>Aligned text</p>',
+      plugins: [TextAlignPlugin, HeadingsPlugin],
+    });
+    const host = document.createElement('div');
+
+    editor.mount(host);
+
+    expect(TextAlignPlugin.key).toBe('textAlign');
+    expect(editor.canExecute('setTextAlignCenter')).toBeTrue();
+    expect(editor.isCommandActive('setTextAlignLeft')).toBeTrue();
+    expect(editor.query('textAlign')).toBe('left');
+    expect(editor.execute('setTextAlignCenter')).toBeTrue();
+    expect(editor.isCommandActive('setTextAlignCenter')).toBeTrue();
+    expect(editor.query('textAlign')).toBe('center');
+    expect(editor.html()).toBe(
+      '<p style="text-align: center;">Aligned text</p>',
+    );
+    expect(editor.execute('setTextAlignLeft')).toBeTrue();
+    expect(editor.html()).toBe('<p>Aligned text</p>');
+
+    editor.setHtml('<h2 style="text-align: right;">Aligned heading</h2>');
+
+    expect(editor.isCommandActive('setTextAlignRight')).toBeTrue();
+    expect(editor.query('textAlign')).toBe('right');
+    expect(editor.execute('setTextAlignJustify')).toBeTrue();
+    expect(editor.html()).toBe(
+      '<h2 style="text-align: justify;">Aligned heading</h2>',
+    );
+
+    editor.unmount(host);
+  });
+
+  it('should align list items and blockquotes at the container level', () => {
+    const editor = createRteEditor({
+      content:
+        '<ul><li><p>Aligned list item</p></li></ul><blockquote><p>Aligned quote</p></blockquote>',
+      plugins: [TextAlignPlugin, ListsPlugin, BlockquotePlugin],
+    });
+    const host = document.createElement('div');
+
+    editor.mount(host);
+
+    expect(editor.execute('setTextAlignCenter')).toBeTrue();
+    expect(editor.html()).toContain(
+      '<li style="text-align: center;"><p>Aligned list item</p></li>',
+    );
+    expect(editor.execute('setTextAlignLeft')).toBeTrue();
+    expect(editor.html()).toContain('<li><p>Aligned list item</p></li>');
+
+    editor.setHtml('<blockquote><p>Aligned quote</p></blockquote>');
+
+    expect(editor.execute('setTextAlignRight')).toBeTrue();
+    expect(editor.html()).toBe(
+      '<blockquote style="text-align: right;"><p>Aligned quote</p></blockquote>',
+    );
+
+    editor.unmount(host);
+  });
+
+  it('should expose configurable text alignment defaults and validation', () => {
+    const configured = TextAlignPlugin.configure({
+      alignments: ['left', 'center'],
+      nodes: ['paragraph'],
+    });
+
+    expect(TEXT_ALIGN_PLUGIN_DEFAULT_OPTIONS).toEqual({
+      alignments: ['left', 'center', 'right', 'justify'],
+      nodes: ['paragraph', 'heading', 'listItem', 'blockquote'],
+    });
+    expect(TextAlignPlugin.options).toEqual(TEXT_ALIGN_PLUGIN_DEFAULT_OPTIONS);
+    expect(configured.options).toEqual({
+      alignments: ['left', 'center'],
+      nodes: ['paragraph'],
+    });
+    expect(() =>
+      TextAlignPlugin.configure({
+        alignments: [],
+      }),
+    ).toThrowError(
+      'TextAlignPlugin alignments must include at least one value.',
+    );
+    expect(() =>
+      TextAlignPlugin.configure({
+        alignments: ['center', 'center'],
+      }),
+    ).toThrowError('TextAlignPlugin alignments entries must be unique.');
+    expect(() =>
+      TextAlignPlugin.configure({
+        nodes: ['paragraph', 'paragraph'],
+      }),
+    ).toThrowError('TextAlignPlugin nodes entries must be unique.');
+    expect(() =>
+      createRteEditor({
+        plugins: [
+          createRtePlugin({
+            key: 'badNodeExtension',
+            extendNodes: () => ({ missing: { content: 'inline*' } }),
+          }),
+        ],
+      }),
+    ).toThrowError(
+      'RTE plugin "badNodeExtension" extends unknown node "missing".',
+    );
   });
 
   it('should expose configurable headings defaults and validation', () => {

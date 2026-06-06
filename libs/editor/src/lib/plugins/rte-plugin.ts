@@ -18,6 +18,9 @@ export type RteCommandHandler = (
 export interface RtePlugin {
   key: string;
   nodes?: Record<string, NodeSpec>;
+  extendNodes?: (
+    nodes: Readonly<Record<string, NodeSpec>>,
+  ) => Record<string, NodeSpec>;
   marks?: Record<string, MarkSpec>;
   commands?: (schema: Schema) => Record<string, RteCommandHandler>;
   commandStates?: (schema: Schema) => Record<string, RteStateQuery>;

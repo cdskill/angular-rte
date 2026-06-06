@@ -21,6 +21,7 @@ as the configurable engine-plugin example.
 | ---------------------------- | --------------------------------------------------------- |
 | `key`                        | Stable unique identity for the Angular RTE plugin.        |
 | `nodes`                      | Add optional ProseMirror node specs to the editor schema. |
+| `extendNodes(nodes)`         | Return amended specs for existing schema nodes.           |
 | `marks`                      | Add optional ProseMirror mark specs to the editor schema. |
 | `commands(schema)`           | Register consumer-executable named commands.              |
 | `commandStates(schema)`      | Report meaningful active state for named commands.        |
@@ -63,11 +64,13 @@ A node plugin normally needs:
 
 1. A `NodeSpec` with correct content expression, group, parse rules, and DOM
    serialization.
-2. Commands for inserting, toggling, wrapping, lifting, or changing node type.
-3. State queries only when they provide useful UI state.
-4. Read-only queries only when consumer UI needs structured state.
-5. Keyboard behavior that composes with the base keymap.
-6. Tests for schema validity, parsing, serialization, and editing behavior.
+2. `extendNodes` when a feature needs to add attributes or serialization
+   behavior to an existing schema node such as `paragraph`.
+3. Commands for inserting, toggling, wrapping, lifting, or changing node type.
+4. State queries only when they provide useful UI state.
+5. Read-only queries only when consumer UI needs structured state.
+6. Keyboard behavior that composes with the base keymap.
+7. Tests for schema validity, parsing, serialization, and editing behavior.
 
 Do not introduce an Angular node view until the feature needs Angular-specific
 interactive rendering.

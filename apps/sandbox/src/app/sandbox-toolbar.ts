@@ -5,9 +5,17 @@ import {
   input,
   output,
 } from '@angular/core';
-import { RteCommand, RteEditorController, RteToolbar } from '@angular-rte/editor';
+import {
+  RteCommand,
+  RteEditorController,
+  RteToolbar,
+} from '@angular-rte/editor';
 import { NgIcon, provideIcons } from '@ng-icons/core';
 import {
+  lucideAlignCenter,
+  lucideAlignJustify,
+  lucideAlignLeft,
+  lucideAlignRight,
   lucideBold,
   lucideEraser,
   lucideHeading1,
@@ -39,6 +47,10 @@ import {
   imports: [NgIcon, RteCommand, RteToolbar],
   providers: [
     provideIcons({
+      lucideAlignCenter,
+      lucideAlignJustify,
+      lucideAlignLeft,
+      lucideAlignRight,
       lucideBold,
       lucideEraser,
       lucideHeading1,
@@ -100,6 +112,43 @@ import {
         aria-label="Heading 3"
       >
         <ng-icon name="lucideHeading3" aria-hidden="true" />
+      </button>
+      <span class="mx-1 h-5 w-px bg-slate-300" aria-hidden="true"></span>
+      <button
+        type="button"
+        [class]="commandClass"
+        rteCommand="setTextAlignLeft"
+        title="Align left"
+        aria-label="Align left"
+      >
+        <ng-icon name="lucideAlignLeft" aria-hidden="true" />
+      </button>
+      <button
+        type="button"
+        [class]="commandClass"
+        rteCommand="setTextAlignCenter"
+        title="Align center"
+        aria-label="Align center"
+      >
+        <ng-icon name="lucideAlignCenter" aria-hidden="true" />
+      </button>
+      <button
+        type="button"
+        [class]="commandClass"
+        rteCommand="setTextAlignRight"
+        title="Align right"
+        aria-label="Align right"
+      >
+        <ng-icon name="lucideAlignRight" aria-hidden="true" />
+      </button>
+      <button
+        type="button"
+        [class]="commandClass"
+        rteCommand="setTextAlignJustify"
+        title="Justify"
+        aria-label="Justify"
+      >
+        <ng-icon name="lucideAlignJustify" aria-hidden="true" />
       </button>
       <span class="mx-1 h-5 w-px bg-slate-300" aria-hidden="true"></span>
       <button

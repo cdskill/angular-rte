@@ -8,14 +8,22 @@ test('renders the configured plugin toolbar', async ({ page }) => {
   ).toBeVisible();
 
   const toolbar = page.getByRole('toolbar', { name: 'Editor toolbar' });
-  const paragraph = toolbar.getByRole('button', { name: 'P' });
-  const heading1 = toolbar.getByRole('button', { name: 'H1' });
-  const heading2 = toolbar.getByRole('button', { name: 'H2' });
-  const heading3 = toolbar.getByRole('button', { name: 'H3' });
-  const underline = toolbar.getByRole('button', { name: 'U' });
+  const paragraph = toolbar.getByRole('button', { name: 'Paragraph' });
+  const heading1 = toolbar.getByRole('button', { name: 'Heading 1' });
+  const heading2 = toolbar.getByRole('button', { name: 'Heading 2' });
+  const heading3 = toolbar.getByRole('button', { name: 'Heading 3' });
+  const alignLeft = toolbar.getByRole('button', { name: 'Align left' });
+  const alignCenter = toolbar.getByRole('button', { name: 'Align center' });
+  const alignRight = toolbar.getByRole('button', { name: 'Align right' });
+  const justify = toolbar.getByRole('button', { name: 'Justify' });
+  const underline = toolbar.getByRole('button', { name: 'Underline' });
+  const clearFormatting = toolbar.getByRole('button', {
+    name: 'Clear formatting',
+  });
   const bulletList = toolbar.getByRole('button', { name: 'Bullet list' });
   const orderedList = toolbar.getByRole('button', { name: 'Ordered list' });
   const blockquote = toolbar.getByRole('button', { name: 'Blockquote' });
+  const codeBlock = toolbar.getByRole('button', { name: 'Code block' });
   const liftListItem = toolbar.getByRole('button', { name: 'Lift list item' });
   const sinkListItem = toolbar.getByRole('button', { name: 'Sink list item' });
   const link = toolbar.getByRole('button', { name: 'Link' });
@@ -24,31 +32,42 @@ test('renders the configured plugin toolbar', async ({ page }) => {
   const redo = toolbar.getByRole('button', { name: 'Redo' });
 
   await expect(page.locator('rte-editor > button')).toHaveCount(0);
-  await expect(toolbar.getByRole('button')).toHaveCount(17);
+  await expect(toolbar.getByRole('button')).toHaveCount(23);
   await expect(paragraph).toHaveAttribute('title', 'Paragraph');
   await expect(heading1).toHaveAttribute('title', 'Heading 1');
   await expect(heading2).toHaveAttribute('title', 'Heading 2');
   await expect(heading3).toHaveAttribute('title', 'Heading 3');
-  await expect(toolbar.getByRole('button', { name: 'B' })).toHaveAttribute(
+  await expect(alignLeft).toHaveAttribute('title', 'Align left');
+  await expect(alignLeft).toBeEnabled();
+  await expect(alignCenter).toHaveAttribute('title', 'Align center');
+  await expect(alignCenter).toBeEnabled();
+  await expect(alignRight).toHaveAttribute('title', 'Align right');
+  await expect(alignRight).toBeEnabled();
+  await expect(justify).toHaveAttribute('title', 'Justify');
+  await expect(justify).toBeEnabled();
+  await expect(toolbar.getByRole('button', { name: 'Bold' })).toHaveAttribute(
     'title',
     'Bold',
   );
-  await expect(toolbar.getByRole('button', { name: 'I' })).toHaveAttribute(
+  await expect(toolbar.getByRole('button', { name: 'Italic' })).toHaveAttribute(
     'title',
     'Italic',
   );
   await expect(underline).toHaveAttribute('title', 'Underline');
   await expect(underline).toBeEnabled();
-  await expect(toolbar.getByRole('button', { name: 'S' })).toHaveAttribute(
-    'title',
-    'Strikethrough',
-  );
+  await expect(
+    toolbar.getByRole('button', { name: 'Strikethrough' }),
+  ).toHaveAttribute('title', 'Strikethrough');
+  await expect(clearFormatting).toHaveAttribute('title', 'Clear formatting');
+  await expect(clearFormatting).toBeEnabled();
   await expect(bulletList).toHaveAttribute('title', 'Bullet list');
   await expect(bulletList).toBeDisabled();
   await expect(orderedList).toHaveAttribute('title', 'Ordered list');
   await expect(orderedList).toBeDisabled();
   await expect(blockquote).toHaveAttribute('title', 'Blockquote');
   await expect(blockquote).toBeEnabled();
+  await expect(codeBlock).toHaveAttribute('title', 'Code block');
+  await expect(codeBlock).toBeEnabled();
   await expect(liftListItem).toHaveAttribute('title', 'Lift list item');
   await expect(liftListItem).toBeDisabled();
   await expect(sinkListItem).toHaveAttribute('title', 'Sink list item');
@@ -61,6 +80,9 @@ test('renders the configured plugin toolbar', async ({ page }) => {
   await expect(redo).toBeDisabled();
 
   await expect(page.locator('.ProseMirror')).toContainText('Angular RTE');
+  await expect(page.locator('pre')).toContainText(
+    '<p style="text-align: center;">Build headless editing primitives with a plugin stack that remains fully selected by the consumer.</p>',
+  );
   await expect(page.locator('pre')).toContainText(
     '<h1><strong>Angular RTE</strong></h1>',
   );
@@ -91,11 +113,28 @@ test('renders the configured plugin toolbar', async ({ page }) => {
   await expect(page.locator('pre')).toContainText(
     '<p>Build headless editing primitives with a plugin stack that remains fully selected by the consumer.</p>',
   );
+  await alignRight.click();
+  await expect(alignRight).toHaveAttribute('aria-pressed', 'true');
+  await expect(page.locator('pre')).toContainText(
+    '<p style="text-align: right;">Build headless editing primitives with a plugin stack that remains fully selected by the consumer.</p>',
+  );
+  await alignLeft.click();
+  await expect(page.locator('pre')).toContainText(
+    '<p>Build headless editing primitives with a plugin stack that remains fully selected by the consumer.</p>',
+  );
   await expect(bulletList).toBeEnabled();
   await expect(orderedList).toBeEnabled();
 
   await bulletList.click();
   await expect(bulletList).toHaveAttribute('aria-pressed', 'true');
+  await expect(page.locator('pre')).toContainText(
+    '<ul><li><p>Build headless editing primitives with a plugin stack that remains fully selected by the consumer.</p></li></ul>',
+  );
+  await alignRight.click();
+  await expect(page.locator('pre')).toContainText(
+    '<ul><li style="text-align: right;"><p>Build headless editing primitives with a plugin stack that remains fully selected by the consumer.</p></li></ul>',
+  );
+  await alignLeft.click();
   await expect(page.locator('pre')).toContainText(
     '<ul><li><p>Build headless editing primitives with a plugin stack that remains fully selected by the consumer.</p></li></ul>',
   );
@@ -134,7 +173,9 @@ test('renders the configured plugin toolbar', async ({ page }) => {
   await expect(underline).toHaveAttribute('aria-pressed', 'true');
 
   await page.locator('.ProseMirror a[href="https://angular.dev"]').hover();
-  await expect(page.getByRole('dialog', { name: 'Link preview' })).toBeVisible();
+  await expect(
+    page.getByRole('dialog', { name: 'Link preview' }),
+  ).toBeVisible();
   await expect(
     page.getByRole('dialog', { name: 'Link preview' }).getByRole('link'),
   ).toContainText('https://angular.dev');

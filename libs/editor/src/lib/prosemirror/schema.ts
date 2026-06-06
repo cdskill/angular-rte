@@ -28,6 +28,14 @@ export function createRteSchema(plugins: readonly RtePlugin[]): Schema {
     addUniqueEntries(marks, plugin.marks, plugin.key, 'mark');
   }
 
+  for (const plugin of plugins) {
+    extendExistingNodes(
+      nodes,
+      plugin.extendNodes?.(Object.freeze({ ...nodes })),
+      plugin.key,
+    );
+  }
+
   return new Schema({
     nodes,
     marks,
@@ -60,5 +68,21 @@ function addUniqueEntries<T>(
     }
 
     target[name] = spec;
+  }
+}
+
+function extendExistingNodes(
+  nodes: Record<string, NodeSpec>,
+  extensions: Record<string, NodeSpec> | undefined,
+  pluginKey: string,
+): void {
+  for (const [name, spec] of Object.entries(extensions ?? {})) {
+    if (!nodes[name]) {
+      throw new Error(
+        `RTE plugin "${pluginKey}" extends unknown node "${name}".`,
+      );
+    }
+
+    nodes[name] = spec;
   }
 }
