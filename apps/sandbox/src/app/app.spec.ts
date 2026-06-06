@@ -1,6 +1,8 @@
 import { TestBed } from '@angular/core/testing';
 import {
   BlockquotePlugin,
+  CODE_BLOCK_PLUGIN_DEFAULT_OPTIONS,
+  CodeBlockPlugin,
   HEADINGS_PLUGIN_DEFAULT_OPTIONS,
   HeadingsPlugin,
   HISTORY_PLUGIN_DEFAULT_OPTIONS,
@@ -11,11 +13,12 @@ import {
 } from '@angular-rte/editor';
 
 import { App } from './app';
+import { SandboxLinkPopover } from './sandbox-link-popover';
 
 describe('App', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [App],
+      imports: [App, SandboxLinkPopover],
     }).compileComponents();
   });
 
@@ -28,7 +31,7 @@ describe('App', () => {
       'ProseMirror editor foundation',
     );
     expect(compiled.querySelectorAll('[role="toolbar"] button')).toHaveLength(
-      17,
+      18,
     );
     expect(compiled.querySelector('[aria-label="Link URL"]')).toBeNull();
     expect(compiled.querySelector('.ProseMirror')?.textContent).toContain(
@@ -44,6 +47,243 @@ describe('App', () => {
       compiled.querySelector('.ProseMirror blockquote')?.textContent,
     ).toContain(
       'Quote important passages without taking ownership away from the consuming app.',
+    );
+    expect(
+      compiled.querySelector('.ProseMirror code.language-typescript')
+        ?.textContent,
+    ).toContain('createRteEditor');
+    expect(
+      compiled.querySelector('.ProseMirror code.language-go')?.textContent,
+    ).toContain('fmt.Println');
+    expect(
+      compiled.querySelector('.ProseMirror code.language-typescript .hljs-keyword')
+        ?.textContent,
+    ).toContain('import');
+    expect(
+      compiled.querySelector('.ProseMirror code.language-go .hljs-keyword')
+        ?.textContent,
+    ).toContain('package');
+    expect(
+      Array.from(
+        compiled.querySelectorAll('.ProseMirror .sandbox-code-block-language'),
+      ).map((element) => element.textContent?.trim()),
+    ).toEqual(['TypeScript', 'Go']);
+    expect(
+      Array.from(
+        compiled.querySelectorAll<HTMLButtonElement>(
+          '.ProseMirror .sandbox-code-block-copy',
+        ),
+      ).map((button) => button.getAttribute('aria-label')),
+    ).toEqual(['Copy TypeScript code', 'Copy Go code']);
+  });
+
+  it('should render icon-only actions in the link popover', async () => {
+    const fixture = TestBed.createComponent(SandboxLinkPopover);
+    const popover = {
+      editing: false,
+      element: null,
+      href: 'https://angular.dev',
+      left: 16,
+      rel: 'noopener noreferrer',
+      target: '_blank' as const,
+      text: 'Angular',
+      top: 16,
+    };
+
+    fixture.componentRef.setInput('href', popover.href);
+    fixture.componentRef.setInput('popover', popover);
+    await fixture.whenStable();
+    fixture.detectChanges();
+
+    let compiled = fixture.nativeElement as HTMLElement;
+
+    expect(
+      Array.from(compiled.querySelectorAll('button')).map((button) =>
+        button.getAttribute('aria-label'),
+      ),
+    ).toEqual(['Edit link', 'Unlink']);
+    expect(compiled.querySelectorAll('ng-icon').length).toBeGreaterThanOrEqual(
+      3,
+    );
+
+    fixture.componentRef.setInput('popover', {
+      ...popover,
+      editing: true,
+    });
+    await fixture.whenStable();
+    fixture.detectChanges();
+    compiled = fixture.nativeElement as HTMLElement;
+
+    expect(
+      Array.from(compiled.querySelectorAll('button')).map((button) =>
+        button.getAttribute('aria-label'),
+      ),
+    ).toEqual(['Save link', 'Cancel']);
+    expect(compiled.querySelectorAll('ng-icon').length).toBeGreaterThanOrEqual(
+      3,
+    );
+  });
+
+  it('should expose code block commands through the public plugin', () => {
+    const snippet =
+      'const language = "typescript"; const enabled = language.length > 0; console.log({ enabled, language });';
+    const editor = createRteEditor({
+      content: `<p>${snippet}</p>`,
+      plugins: [
+        CodeBlockPlugin.configure({
+          languages: ['plaintext', 'typescript', 'javascript', 'csharp', 'go'],
+          defaultLanguage: 'typescript',
+        }),
+      ],
+    });
+    const host = document.createElement('div');
+
+    editor.mount(host);
+
+    expect(CodeBlockPlugin.key).toBe('codeBlock');
+    expect(editor.execute('toggleCodeBlock')).toBeTrue();
+    expect(editor.isCommandActive('toggleCodeBlock')).toBeTrue();
+    expect(editor.query<string>('codeBlockLanguage')).toBe('typescript');
+    expect(editor.html()).toBe(
+      `<pre><code class="language-typescript">${snippet}</code></pre>`,
+    );
+    expect(editor.execute('setCodeBlockLanguage', 'go')).toBeTrue();
+    expect(editor.query<string>('codeBlockLanguage')).toBe('go');
+    expect(editor.html()).toBe(
+      `<pre><code class="language-go">${snippet}</code></pre>`,
+    );
+    expect(editor.execute('toggleCodeBlock')).toBeTrue();
+    expect(editor.isCommandActive('toggleCodeBlock')).toBeFalse();
+    expect(editor.query<string>('codeBlockLanguage')).toBeNull();
+    expect(editor.html()).toBe(`<p>${snippet}</p>`);
+
+    editor.unmount(host);
+  });
+
+  it('should parse serialized code blocks through the public plugin', () => {
+    const snippet = [
+      'package main',
+      '',
+      'import "fmt"',
+      '',
+      'func main() {',
+      '  fmt.Println("Angular RTE")',
+      '}',
+    ].join('\n');
+    const editor = createRteEditor({
+      content: `<pre><code class="language-go">${snippet}</code></pre>`,
+      plugins: [
+        CodeBlockPlugin.configure({
+          languages: ['plaintext', 'typescript', 'javascript', 'csharp', 'go'],
+        }),
+      ],
+    });
+    const host = document.createElement('div');
+
+    editor.mount(host);
+
+    expect(editor.html()).toBe(
+      `<pre><code class="language-go">${snippet.replaceAll(
+        '\n',
+        '&#10;',
+      )}</code></pre>`,
+    );
+    expect(editor.isCommandActive('toggleCodeBlock')).toBeTrue();
+    expect(editor.query<string>('codeBlockLanguage')).toBe('go');
+
+    editor.unmount(host);
+  });
+
+  it('should keep Tab inside code blocks for indentation', () => {
+    const editor = createRteEditor({
+      content: '<pre><code class="language-typescript">const answer = 42;</code></pre>',
+      plugins: [
+        CodeBlockPlugin.configure({
+          languages: ['plaintext', 'typescript'],
+          defaultLanguage: 'typescript',
+        }),
+      ],
+    });
+    const host = document.createElement('div');
+
+    editor.mount(host);
+
+    const surface = host.querySelector('.ProseMirror');
+    const tabEvent = new KeyboardEvent('keydown', {
+      bubbles: true,
+      cancelable: true,
+      key: 'Tab',
+    });
+
+    surface?.dispatchEvent(tabEvent);
+
+    expect(tabEvent.defaultPrevented).toBeTrue();
+    expect(editor.html()).toBe(
+      '<pre><code class="language-typescript">  const answer = 42;</code></pre>',
+    );
+
+    const shiftTabEvent = new KeyboardEvent('keydown', {
+      bubbles: true,
+      cancelable: true,
+      key: 'Tab',
+      shiftKey: true,
+    });
+
+    surface?.dispatchEvent(shiftTabEvent);
+
+    expect(shiftTabEvent.defaultPrevented).toBeTrue();
+    expect(editor.html()).toBe(
+      '<pre><code class="language-typescript">const answer = 42;</code></pre>',
+    );
+
+    editor.unmount(host);
+  });
+
+  it('should expose configurable code block defaults and validation', () => {
+    const configured = CodeBlockPlugin.configure({
+      languages: ['plaintext', 'typescript', 'go'],
+      defaultLanguage: 'go',
+    });
+
+    expect(CODE_BLOCK_PLUGIN_DEFAULT_OPTIONS).toEqual({
+      languages: ['plaintext'],
+      defaultLanguage: 'plaintext',
+      languageClassPrefix: 'language-',
+      indentText: '  ',
+    });
+    expect(CodeBlockPlugin.options).toEqual(CODE_BLOCK_PLUGIN_DEFAULT_OPTIONS);
+    expect(configured.options).toEqual({
+      languages: ['plaintext', 'typescript', 'go'],
+      defaultLanguage: 'go',
+      languageClassPrefix: 'language-',
+      indentText: '  ',
+    });
+    expect(() =>
+      CodeBlockPlugin.configure({
+        languages: [],
+      }),
+    ).toThrowError(
+      'CodeBlockPlugin languages must include at least one language.',
+    );
+    expect(() =>
+      CodeBlockPlugin.configure({
+        languages: ['typescript', 'typescript'],
+      }),
+    ).toThrowError('CodeBlockPlugin languages entries must be unique.');
+    expect(() =>
+      CodeBlockPlugin.configure({
+        languages: ['typescript'],
+        defaultLanguage: 'go',
+      }),
+    ).toThrowError(
+      'CodeBlockPlugin defaultLanguage must be included in languages.',
+    );
+    expect(() =>
+      CodeBlockPlugin.configure({
+        indentText: '->',
+      }),
+    ).toThrowError(
+      'CodeBlockPlugin indentText must be a non-empty string containing only spaces or tabs.',
     );
   });
 

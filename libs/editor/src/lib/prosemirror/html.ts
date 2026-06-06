@@ -26,5 +26,5 @@ export function serializeHtmlDocument(
 
   container.appendChild(fragment);
 
-  return container.innerHTML;
+  return container.innerHTML.replace(/\n/g, '&#10;');
 }

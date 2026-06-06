@@ -1,8 +1,63 @@
-import { Component, computed, input, output } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  input,
+  output,
+} from '@angular/core';
 import { RteCommand, RteEditorController, RteToolbar } from '@angular-rte/editor';
+import { NgIcon, provideIcons } from '@ng-icons/core';
+import {
+  lucideBold,
+  lucideHeading1,
+  lucideHeading2,
+  lucideHeading3,
+  lucideIndent,
+  lucideItalic,
+  lucideLink,
+  lucideList,
+  lucideListOrdered,
+  lucideOutdent,
+  lucidePilcrow,
+  lucideRedo2,
+  lucideSquareCode,
+  lucideStrikethrough,
+  lucideTextQuote,
+  lucideUnderline,
+  lucideUndo2,
+  lucideUnlink,
+} from '@ng-icons/lucide';
+
+import {
+  SANDBOX_CODE_BLOCK_LANGUAGES,
+  SANDBOX_DEFAULT_CODE_BLOCK_LANGUAGE,
+} from './sandbox-code-block';
 
 @Component({
-  imports: [RteCommand, RteToolbar],
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [NgIcon, RteCommand, RteToolbar],
+  providers: [
+    provideIcons({
+      lucideBold,
+      lucideHeading1,
+      lucideHeading2,
+      lucideHeading3,
+      lucideIndent,
+      lucideItalic,
+      lucideLink,
+      lucideList,
+      lucideListOrdered,
+      lucideOutdent,
+      lucidePilcrow,
+      lucideRedo2,
+      lucideSquareCode,
+      lucideStrikethrough,
+      lucideTextQuote,
+      lucideUnderline,
+      lucideUndo2,
+      lucideUnlink,
+    }),
+  ],
   selector: 'app-sandbox-toolbar',
   template: `
     <rte-toolbar
@@ -13,32 +68,36 @@ import { RteCommand, RteEditorController, RteToolbar } from '@angular-rte/editor
         [class]="commandClass"
         rteCommand="setParagraph"
         title="Paragraph"
+        aria-label="Paragraph"
       >
-        P
+        <ng-icon name="lucidePilcrow" aria-hidden="true" />
       </button>
       <button
         type="button"
         [class]="commandClass"
         rteCommand="toggleHeading1"
         title="Heading 1"
+        aria-label="Heading 1"
       >
-        H1
+        <ng-icon name="lucideHeading1" aria-hidden="true" />
       </button>
       <button
         type="button"
         [class]="commandClass"
         rteCommand="toggleHeading2"
         title="Heading 2"
+        aria-label="Heading 2"
       >
-        H2
+        <ng-icon name="lucideHeading2" aria-hidden="true" />
       </button>
       <button
         type="button"
         [class]="commandClass"
         rteCommand="toggleHeading3"
         title="Heading 3"
+        aria-label="Heading 3"
       >
-        H3
+        <ng-icon name="lucideHeading3" aria-hidden="true" />
       </button>
       <span class="mx-1 h-5 w-px bg-slate-300" aria-hidden="true"></span>
       <button
@@ -46,32 +105,36 @@ import { RteCommand, RteEditorController, RteToolbar } from '@angular-rte/editor
         [class]="commandClass"
         rteCommand="toggleBold"
         title="Bold"
+        aria-label="Bold"
       >
-        <strong>B</strong>
+        <ng-icon name="lucideBold" aria-hidden="true" />
       </button>
       <button
         type="button"
         [class]="commandClass"
         rteCommand="toggleItalic"
         title="Italic"
+        aria-label="Italic"
       >
-        <em>I</em>
+        <ng-icon name="lucideItalic" aria-hidden="true" />
       </button>
       <button
         type="button"
         [class]="commandClass"
         rteCommand="toggleUnderline"
         title="Underline"
+        aria-label="Underline"
       >
-        <u>U</u>
+        <ng-icon name="lucideUnderline" aria-hidden="true" />
       </button>
       <button
         type="button"
         [class]="commandClass"
         rteCommand="toggleStrike"
         title="Strikethrough"
+        aria-label="Strikethrough"
       >
-        <s>S</s>
+        <ng-icon name="lucideStrikethrough" aria-hidden="true" />
       </button>
       <span class="mx-1 h-5 w-px bg-slate-300" aria-hidden="true"></span>
       <button
@@ -81,7 +144,7 @@ import { RteCommand, RteEditorController, RteToolbar } from '@angular-rte/editor
         title="Bullet list"
         aria-label="Bullet list"
       >
-        UL
+        <ng-icon name="lucideList" aria-hidden="true" />
       </button>
       <button
         type="button"
@@ -90,7 +153,7 @@ import { RteCommand, RteEditorController, RteToolbar } from '@angular-rte/editor
         title="Ordered list"
         aria-label="Ordered list"
       >
-        OL
+        <ng-icon name="lucideListOrdered" aria-hidden="true" />
       </button>
       <button
         type="button"
@@ -99,8 +162,34 @@ import { RteCommand, RteEditorController, RteToolbar } from '@angular-rte/editor
         title="Blockquote"
         aria-label="Blockquote"
       >
-        Quote
+        <ng-icon name="lucideTextQuote" aria-hidden="true" />
       </button>
+      <button
+        type="button"
+        [class]="commandClass"
+        rteCommand="toggleCodeBlock"
+        title="Code block"
+        aria-label="Code block"
+      >
+        <ng-icon name="lucideSquareCode" aria-hidden="true" />
+      </button>
+      @if (codeBlockActive()) {
+        <select
+          [class]="languageSelectClass"
+          [value]="codeBlockLanguage()"
+          (change)="setCodeBlockLanguage($event)"
+          aria-label="Code block language"
+        >
+          @for (language of codeBlockLanguages; track language.value) {
+            <option
+              [value]="language.value"
+              [selected]="language.value === codeBlockLanguage()"
+            >
+              {{ language.label }}
+            </option>
+          }
+        </select>
+      }
       <button
         type="button"
         [class]="commandClass"
@@ -108,7 +197,7 @@ import { RteCommand, RteEditorController, RteToolbar } from '@angular-rte/editor
         title="Lift list item"
         aria-label="Lift list item"
       >
-        Out
+        <ng-icon name="lucideOutdent" aria-hidden="true" />
       </button>
       <button
         type="button"
@@ -117,7 +206,7 @@ import { RteCommand, RteEditorController, RteToolbar } from '@angular-rte/editor
         title="Sink list item"
         aria-label="Sink list item"
       >
-        In
+        <ng-icon name="lucideIndent" aria-hidden="true" />
       </button>
       <span class="mx-1 h-5 w-px bg-slate-300" aria-hidden="true"></span>
       <button
@@ -129,16 +218,18 @@ import { RteCommand, RteEditorController, RteToolbar } from '@angular-rte/editor
         (mousedown)="preserveSelection($event)"
         (click)="requestLink.emit($event)"
         title="Link"
+        aria-label="Link"
       >
-        Link
+        <ng-icon name="lucideLink" aria-hidden="true" />
       </button>
       <button
         type="button"
         [class]="commandClass"
         rteCommand="unsetLink"
         title="Unlink"
+        aria-label="Unlink"
       >
-        Unlink
+        <ng-icon name="lucideUnlink" aria-hidden="true" />
       </button>
       <span class="mx-1 h-5 w-px bg-slate-300" aria-hidden="true"></span>
       <button
@@ -146,16 +237,18 @@ import { RteCommand, RteEditorController, RteToolbar } from '@angular-rte/editor
         [class]="commandClass"
         rteCommand="undo"
         title="Undo"
+        aria-label="Undo"
       >
-        Undo
+        <ng-icon name="lucideUndo2" aria-hidden="true" />
       </button>
       <button
         type="button"
         [class]="commandClass"
         rteCommand="redo"
         title="Redo"
+        aria-label="Redo"
       >
-        Redo
+        <ng-icon name="lucideRedo2" aria-hidden="true" />
       </button>
     </rte-toolbar>
   `,
@@ -170,11 +263,30 @@ export class SandboxToolbar {
   protected readonly linkActive = computed(() =>
     this.editor().isCommandActive('setLink'),
   );
+  protected readonly codeBlockActive = computed(() =>
+    this.editor().isCommandActive('toggleCodeBlock'),
+  );
+  protected readonly codeBlockLanguage = computed(
+    () =>
+      this.editor().query<string>('codeBlockLanguage') ??
+      SANDBOX_DEFAULT_CODE_BLOCK_LANGUAGE,
+  );
 
+  protected readonly codeBlockLanguages = SANDBOX_CODE_BLOCK_LANGUAGES;
   protected readonly commandClass =
-    'min-h-8 min-w-8 rounded-md border border-slate-300 bg-white px-2.5 text-center text-sm font-semibold leading-none text-slate-700 transition hover:border-sky-600 hover:bg-sky-50 hover:text-sky-900 disabled:cursor-not-allowed disabled:opacity-45 [&.rte-command-active]:border-sky-600 [&.rte-command-active]:bg-sky-50 [&.rte-command-active]:text-sky-900';
+    'inline-flex h-8 w-8 items-center justify-center rounded-md border border-slate-300 bg-white text-slate-700 transition hover:border-sky-600 hover:bg-sky-50 hover:text-sky-900 disabled:cursor-not-allowed disabled:opacity-45 [&.rte-command-active]:border-sky-600 [&.rte-command-active]:bg-sky-50 [&.rte-command-active]:text-sky-900';
+  protected readonly languageSelectClass =
+    'h-8 rounded-md border border-slate-300 bg-white px-2 text-xs font-medium text-slate-700 transition hover:border-sky-600 hover:bg-sky-50 hover:text-sky-900 focus:border-sky-600 focus:outline-none focus:ring-2 focus:ring-sky-200';
 
   protected preserveSelection(event: MouseEvent): void {
     event.preventDefault();
+  }
+
+  protected setCodeBlockLanguage(event: Event): void {
+    const target = event.target;
+
+    if (target instanceof HTMLSelectElement) {
+      this.editor().execute('setCodeBlockLanguage', target.value);
+    }
   }
 }

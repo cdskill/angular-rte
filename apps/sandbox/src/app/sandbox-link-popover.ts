@@ -1,8 +1,28 @@
 import { Component, input, output } from '@angular/core';
+import { NgIcon, provideIcons } from '@ng-icons/core';
+import {
+  lucideCheck,
+  lucideExternalLink,
+  lucideLink,
+  lucidePencil,
+  lucideUnlink,
+  lucideX,
+} from '@ng-icons/lucide';
 
 import { LinkPopover } from './link-popover.model';
 
 @Component({
+  imports: [NgIcon],
+  providers: [
+    provideIcons({
+      lucideCheck,
+      lucideExternalLink,
+      lucideLink,
+      lucidePencil,
+      lucideUnlink,
+      lucideX,
+    }),
+  ],
   selector: 'app-sandbox-link-popover',
   template: `
     @if (popover(); as popover) {
@@ -20,52 +40,77 @@ import { LinkPopover } from './link-popover.model';
       >
         @if (popover.editing) {
           <div class="flex items-center gap-2">
-            <input
-              class="min-h-8 min-w-0 flex-1 rounded-md border border-slate-300 px-2 text-sm outline-none focus:border-sky-600 focus:ring-2 focus:ring-sky-100"
-              type="url"
-              aria-label="Edit link URL"
-              [value]="href()"
-              (input)="updateHref($event)"
-            />
+            <label
+              class="flex min-h-8 min-w-0 flex-1 items-center gap-2 rounded-md border border-slate-300 px-2 text-sm focus-within:border-sky-600 focus-within:ring-2 focus-within:ring-sky-100"
+            >
+              <ng-icon
+                class="shrink-0 text-slate-500"
+                name="lucideLink"
+                aria-hidden="true"
+              />
+              <input
+                class="min-w-0 flex-1 bg-transparent outline-none"
+                type="url"
+                aria-label="Edit link URL"
+                [value]="href()"
+                (input)="updateHref($event)"
+              />
+            </label>
             <button
               type="button"
-              class="min-h-8 rounded-md bg-slate-900 px-2.5 text-sm font-semibold text-white disabled:opacity-45"
+              class="inline-flex h-8 w-8 items-center justify-center rounded-md bg-slate-900 text-white transition hover:bg-slate-700 disabled:cursor-not-allowed disabled:opacity-45"
               [disabled]="!href().trim()"
               (click)="save.emit(popover)"
+              title="Save link"
+              aria-label="Save link"
             >
-              Save
+              <ng-icon name="lucideCheck" aria-hidden="true" />
             </button>
             <button
               type="button"
-              class="min-h-8 rounded-md border border-slate-300 px-2.5 text-sm font-semibold text-slate-700"
+              class="inline-flex h-8 w-8 items-center justify-center rounded-md border border-slate-300 text-slate-700 transition hover:border-slate-500 hover:bg-slate-100"
               (click)="dismiss.emit()"
+              title="Cancel"
+              aria-label="Cancel"
             >
-              Cancel
+              <ng-icon name="lucideX" aria-hidden="true" />
             </button>
           </div>
         } @else {
           <div class="flex items-center gap-2">
             <a
-              class="min-w-0 flex-1 truncate font-medium text-[#0000ee] underline visited:text-[#551a8b]"
+              class="inline-flex min-w-0 flex-1 items-center gap-1.5 text-[#0000ee] underline visited:text-[#551a8b]"
               [href]="popover.href"
               [target]="popover.target ?? '_blank'"
               [rel]="popover.rel ?? 'noopener noreferrer'"
+              title="Open link"
             >
-              {{ popover.href }}
+              <span class="min-w-0 truncate font-medium">{{
+                popover.href
+              }}</span>
+              <ng-icon
+                class="shrink-0 text-base"
+                name="lucideExternalLink"
+                aria-hidden="true"
+              />
             </a>
             <button
               type="button"
-              class="min-h-8 rounded-md border border-slate-300 px-2.5 text-sm font-semibold text-slate-700"
+              class="inline-flex h-8 w-8 items-center justify-center rounded-md border border-slate-300 text-slate-700 transition hover:border-sky-600 hover:bg-sky-50 hover:text-sky-900"
               (click)="edit.emit(popover)"
+              title="Edit link"
+              aria-label="Edit link"
             >
-              Edit
+              <ng-icon name="lucidePencil" aria-hidden="true" />
             </button>
             <button
               type="button"
-              class="min-h-8 rounded-md border border-slate-300 px-2.5 text-sm font-semibold text-slate-700"
+              class="inline-flex h-8 w-8 items-center justify-center rounded-md border border-slate-300 text-slate-700 transition hover:border-rose-500 hover:bg-rose-50 hover:text-rose-700"
               (click)="remove.emit(popover)"
+              title="Unlink"
+              aria-label="Unlink"
             >
-              Unlink
+              <ng-icon name="lucideUnlink" aria-hidden="true" />
             </button>
           </div>
         }

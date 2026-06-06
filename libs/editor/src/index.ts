@@ -4,6 +4,7 @@ export * from './lib/editor/editor';
 export * from './lib/editor/rte-editor-controller';
 export * from './lib/editor/toolbar';
 export * from './lib/plugins/blockquote';
+export * from './lib/plugins/code-block';
 export * from './lib/plugins/history';
 export * from './lib/plugins/headings';
 export * from './lib/plugins/link';

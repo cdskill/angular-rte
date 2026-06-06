@@ -81,6 +81,7 @@ export class RteEditorController {
       dispatchTransaction: (transaction) =>
         this.dispatchTransaction(transaction),
     });
+    this.syncHtmlFromEditorState();
     this.bumpViewVersion();
   }
 
@@ -161,9 +162,9 @@ export class RteEditorController {
       return;
     }
 
-    this.htmlState.set(html);
-
     if (!this.editorView) {
+      this.htmlState.set(html);
+
       return;
     }
 
@@ -173,6 +174,7 @@ export class RteEditorController {
       schema: this.schema,
     });
     this.editorView.updateState(this.editorState);
+    this.syncHtmlFromEditorState();
     this.bumpViewVersion();
   }
 
@@ -203,12 +205,22 @@ export class RteEditorController {
     this.editorView?.updateState(this.editorState);
 
     if (transaction.docChanged) {
-      this.htmlState.set(
-        serializeHtmlDocument(this.editorState.doc, this.schema),
-      );
+      this.syncHtmlFromEditorState();
     }
 
     this.bumpViewVersion();
+  }
+
+  private syncHtmlFromEditorState(): void {
+    if (!this.editorState) {
+      return;
+    }
+
+    const html = serializeHtmlDocument(this.editorState.doc, this.schema);
+
+    if (html !== this.html()) {
+      this.htmlState.set(html);
+    }
   }
 
   private bumpViewVersion(): void {
