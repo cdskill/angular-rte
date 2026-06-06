@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import {
   BlockquotePlugin,
+  ClearFormattingPlugin,
   CodeBlockPlugin,
   HeadingsPlugin,
   HistoryPlugin,
@@ -80,6 +81,7 @@ export class SandboxEditor {
         languages: SANDBOX_CODE_BLOCK_LANGUAGE_VALUES,
         defaultLanguage: SANDBOX_DEFAULT_CODE_BLOCK_LANGUAGE,
       }),
+      ClearFormattingPlugin,
       SandboxCodeHighlightPlugin,
       HistoryPlugin.configure({
         depth: 200,

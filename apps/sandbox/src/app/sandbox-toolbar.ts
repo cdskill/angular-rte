@@ -9,6 +9,7 @@ import { RteCommand, RteEditorController, RteToolbar } from '@angular-rte/editor
 import { NgIcon, provideIcons } from '@ng-icons/core';
 import {
   lucideBold,
+  lucideEraser,
   lucideHeading1,
   lucideHeading2,
   lucideHeading3,
@@ -39,6 +40,7 @@ import {
   providers: [
     provideIcons({
       lucideBold,
+      lucideEraser,
       lucideHeading1,
       lucideHeading2,
       lucideHeading3,
@@ -135,6 +137,15 @@ import {
         aria-label="Strikethrough"
       >
         <ng-icon name="lucideStrikethrough" aria-hidden="true" />
+      </button>
+      <button
+        type="button"
+        [class]="commandClass"
+        rteCommand="clearFormatting"
+        title="Clear formatting"
+        aria-label="Clear formatting"
+      >
+        <ng-icon name="lucideEraser" aria-hidden="true" />
       </button>
       <span class="mx-1 h-5 w-px bg-slate-300" aria-hidden="true"></span>
       <button

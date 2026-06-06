@@ -2,6 +2,7 @@ import { TestBed } from '@angular/core/testing';
 import {
   BlockquotePlugin,
   CODE_BLOCK_PLUGIN_DEFAULT_OPTIONS,
+  ClearFormattingPlugin,
   CodeBlockPlugin,
   HEADINGS_PLUGIN_DEFAULT_OPTIONS,
   HeadingsPlugin,
@@ -9,6 +10,7 @@ import {
   HistoryPlugin,
   LINK_PLUGIN_DEFAULT_OPTIONS,
   LinkPlugin,
+  TextFormattingKit,
   createRteEditor,
 } from '@angular-rte/editor';
 
@@ -31,8 +33,9 @@ describe('App', () => {
       'ProseMirror editor foundation',
     );
     expect(compiled.querySelectorAll('[role="toolbar"] button')).toHaveLength(
-      18,
+      19,
     );
+    expect(compiled.querySelector('[aria-label="Clear formatting"]')).not.toBeNull();
     expect(compiled.querySelector('[aria-label="Link URL"]')).toBeNull();
     expect(compiled.querySelector('.ProseMirror')?.textContent).toContain(
       'Angular RTE',
@@ -156,6 +159,56 @@ describe('App', () => {
     expect(editor.isCommandActive('toggleCodeBlock')).toBeFalse();
     expect(editor.query<string>('codeBlockLanguage')).toBeNull();
     expect(editor.html()).toBe(`<p>${snippet}</p>`);
+
+    editor.unmount(host);
+  });
+
+  it('should expose clear formatting through the public plugin', () => {
+    const editor = createRteEditor({
+      content:
+        '<h2><strong><em><a href="https://angular.dev">Angular RTE</a></em></strong></h2>',
+      plugins: [
+        HeadingsPlugin,
+        ...TextFormattingKit,
+        LinkPlugin,
+        ClearFormattingPlugin,
+      ],
+    });
+    const host = document.createElement('div');
+
+    editor.mount(host);
+
+    expect(ClearFormattingPlugin.key).toBe('clearFormatting');
+    expect(editor.execute('selectLink')).toBeTrue();
+    expect(editor.canExecute('clearFormatting')).toBeTrue();
+    expect(editor.execute('clearFormatting')).toBeTrue();
+    expect(editor.html()).toBe('<p>Angular RTE</p>');
+    expect(editor.canExecute('clearFormatting')).toBeFalse();
+    expect(editor.execute('clearFormatting')).toBeFalse();
+
+    editor.unmount(host);
+  });
+
+  it('should clear code block formatting to a paragraph', () => {
+    const editor = createRteEditor({
+      content:
+        '<pre><code class="language-typescript">const answer = 42;</code></pre>',
+      plugins: [
+        CodeBlockPlugin.configure({
+          languages: ['plaintext', 'typescript'],
+          defaultLanguage: 'typescript',
+        }),
+        ClearFormattingPlugin,
+      ],
+    });
+    const host = document.createElement('div');
+
+    editor.mount(host);
+
+    expect(editor.canExecute('clearFormatting')).toBeTrue();
+    expect(editor.execute('clearFormatting')).toBeTrue();
+    expect(editor.html()).toBe('<p>const answer = 42;</p>');
+    expect(editor.isCommandActive('toggleCodeBlock')).toBeFalse();
 
     editor.unmount(host);
   });
