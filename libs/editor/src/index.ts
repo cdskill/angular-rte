@@ -17,3 +17,4 @@ export * from './lib/plugins/placeholder';
 export * from './lib/plugins/rte-plugin';
 export * from './lib/plugins/text-align';
 export * from './lib/plugins/text-formatting';
+export * from './lib/plugins/trailing-paragraph';

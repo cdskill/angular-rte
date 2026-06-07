@@ -21,6 +21,7 @@ import {
   TEXT_ALIGN_PLUGIN_DEFAULT_OPTIONS,
   TextAlignPlugin,
   TextFormattingKit,
+  TrailingParagraphPlugin,
   createRteEditor,
   createRtePlugin,
 } from '@angular-rte/editor';
@@ -355,6 +356,46 @@ describe('App', () => {
       host.querySelector('.custom-placeholder[data-placeholder="Start here"]'),
     ).toBeNull();
     expect(editor.html()).toBe('<p>Angular RTE</p>');
+
+    editor.unmount(host);
+  });
+
+  it('should expose trailing paragraph behavior through the public plugin', async () => {
+    const editor = createRteEditor({
+      content:
+        '<pre><code class="language-typescript">const answer = 42;</code></pre>',
+      plugins: [
+        CodeBlockPlugin.configure({
+          languages: ['plaintext', 'typescript'],
+          defaultLanguage: 'typescript',
+        }),
+        TrailingParagraphPlugin,
+      ],
+    });
+    const host = document.createElement('div');
+
+    editor.mount(host);
+    await flushMicrotasks();
+
+    expect(TrailingParagraphPlugin.key).toBe('trailingParagraph');
+    expect(editor.html()).toBe(
+      '<pre><code class="language-typescript">const answer = 42;</code></pre><p></p>',
+    );
+
+    editor.setHtml('<p>Angular RTE</p>');
+    await flushMicrotasks();
+
+    expect(editor.html()).toBe('<p>Angular RTE</p><p></p>');
+
+    editor.setHtml('<p>Angular RTE</p><p></p>');
+    await flushMicrotasks();
+
+    expect(editor.html()).toBe('<p>Angular RTE</p><p></p>');
+
+    editor.setHtml('<p></p>');
+    await flushMicrotasks();
+
+    expect(editor.html()).toBe('<p></p>');
 
     editor.unmount(host);
   });
@@ -891,4 +932,8 @@ function selectEditorRange(
   view.dispatch(
     view.state.tr.setSelection(TextSelection.create(view.state.doc, from, to)),
   );
+}
+
+async function flushMicrotasks(): Promise<void> {
+  await Promise.resolve();
 }

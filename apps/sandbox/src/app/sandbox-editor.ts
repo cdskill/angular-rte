@@ -16,6 +16,7 @@ import {
   TextAlignPlugin,
   createRteEditor,
   TextFormattingKit,
+  TrailingParagraphPlugin,
 } from '@angular-rte/editor';
 
 import { LinkPopoverController } from './link-popover-controller';
@@ -94,6 +95,7 @@ export class SandboxEditor {
       }),
       HardBreakPlugin,
       ClearFormattingPlugin,
+      TrailingParagraphPlugin,
       SandboxCodeHighlightPlugin,
       HistoryPlugin.configure({
         depth: 200,
