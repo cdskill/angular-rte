@@ -100,6 +100,10 @@ Create these only when the current implementation demonstrates the boundary.
 - Avoid an Angular component per document node unless a custom node view truly
   needs Angular behavior.
 - Keep optional features and heavy dependencies out of the mandatory path.
+- Keep `libs/editor` side-effect free so host bundlers can tree-shake unused
+  first-party plugins from `@angular-rte/editor` barrel imports. Plugin modules
+  must not register global behavior, patch prototypes, mutate shared runtime
+  state, import global CSS, or perform browser work at module evaluation time.
 
 ## Decision Test
 
