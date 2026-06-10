@@ -6,11 +6,11 @@ import {
 } from 'prosemirror-state';
 
 import {
-  createConfigurableRtePlugin,
-  createRtePlugin,
-  RteCommandHandler,
-  RtePlugin,
-} from './rte-plugin';
+  createConfigurableQalmaPlugin,
+  createQalmaPlugin,
+  QalmaCommandHandler,
+  QalmaPlugin,
+} from './qalma-plugin';
 
 export interface CodeBlockPluginOptions {
   languages: readonly string[];
@@ -27,7 +27,7 @@ export const CODE_BLOCK_PLUGIN_DEFAULT_OPTIONS: Readonly<CodeBlockPluginOptions>
     indentText: '  ',
   });
 
-export const CodeBlockPlugin = createConfigurableRtePlugin(
+export const CodeBlockPlugin = createConfigurableQalmaPlugin(
   CODE_BLOCK_PLUGIN_DEFAULT_OPTIONS,
   (options) => {
     assertCodeBlockPluginOptions(options);
@@ -65,7 +65,7 @@ export const CodeBlockPlugin = createConfigurableRtePlugin(
       ],
     };
 
-    return createRtePlugin({
+    return createQalmaPlugin({
       key: 'codeBlock',
       nodes: {
         codeBlock: codeBlockNode,
@@ -105,13 +105,13 @@ export const CodeBlockPlugin = createConfigurableRtePlugin(
   },
 );
 
-export const CodeBlockKit: readonly RtePlugin[] = [CodeBlockPlugin];
+export const CodeBlockKit: readonly QalmaPlugin[] = [CodeBlockPlugin];
 
 function createToggleCodeBlockCommand(
   codeBlock: NodeType,
   paragraph: NodeType,
   options: Readonly<CodeBlockPluginOptions>,
-): RteCommandHandler {
+): QalmaCommandHandler {
   return (state, dispatch, _view, value) => {
     if (isCodeBlockActive(state, codeBlock)) {
       return setBlockType(paragraph)(state, dispatch);
@@ -133,7 +133,7 @@ function createToggleCodeBlockCommand(
 function createSetCodeBlockLanguageCommand(
   codeBlock: NodeType,
   options: Readonly<CodeBlockPluginOptions>,
-): RteCommandHandler {
+): QalmaCommandHandler {
   return (state, dispatch, _view, value) => {
     const language = resolveCommandLanguage(value, options);
     const activeCodeBlock = getActiveCodeBlock(state, codeBlock);

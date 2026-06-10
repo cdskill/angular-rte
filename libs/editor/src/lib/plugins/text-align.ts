@@ -10,11 +10,11 @@ import {
 import { EditorState } from 'prosemirror-state';
 
 import {
-  createConfigurableRtePlugin,
-  createRtePlugin,
-  RteCommandHandler,
-  RtePlugin,
-} from './rte-plugin';
+  createConfigurableQalmaPlugin,
+  createQalmaPlugin,
+  QalmaCommandHandler,
+  QalmaPlugin,
+} from './qalma-plugin';
 
 export type TextAlignment = 'left' | 'center' | 'right' | 'justify';
 export type TextAlignNode = 'paragraph' | 'heading' | 'listItem' | 'blockquote';
@@ -44,12 +44,12 @@ export const TEXT_ALIGN_PLUGIN_DEFAULT_OPTIONS: Readonly<TextAlignPluginOptions>
     nodes: TEXT_ALIGN_NODES,
   });
 
-export const TextAlignPlugin = createConfigurableRtePlugin(
+export const TextAlignPlugin = createConfigurableQalmaPlugin(
   TEXT_ALIGN_PLUGIN_DEFAULT_OPTIONS,
   (options) => {
     assertTextAlignPluginOptions(options);
 
-    return createRtePlugin({
+    return createQalmaPlugin({
       key: 'textAlign',
       extendNodes: (nodes) => createTextAlignNodeExtensions(nodes, options),
       commands: (schema) =>
@@ -64,7 +64,7 @@ export const TextAlignPlugin = createConfigurableRtePlugin(
   },
 );
 
-export const TextAlignKit: readonly RtePlugin[] = [TextAlignPlugin];
+export const TextAlignKit: readonly QalmaPlugin[] = [TextAlignPlugin];
 
 function createTextAlignNodeExtensions(
   nodes: Readonly<Record<string, NodeSpec>>,
@@ -176,7 +176,7 @@ function createTextAlignCommands(
   schema: Schema,
   alignments: readonly TextAlignment[],
   nodes: readonly TextAlignNode[],
-): Record<string, RteCommandHandler> {
+): Record<string, QalmaCommandHandler> {
   const nodeTypes = getNodeTypes(schema, nodes);
 
   return Object.fromEntries(
@@ -205,7 +205,7 @@ function createTextAlignCommandStates(
 function createSetTextAlignCommand(
   nodeTypes: readonly NodeType[],
   alignment: TextAlignment,
-): RteCommandHandler {
+): QalmaCommandHandler {
   return (state, dispatch) => {
     const targets = getSelectedAlignmentTargets(state, nodeTypes);
 

@@ -4,20 +4,20 @@ import { Schema } from 'prosemirror-model';
 import { Command, Plugin as ProseMirrorPlugin } from 'prosemirror-state';
 
 import {
-  RteCommandHandler,
-  RtePlugin,
-  RteQuery,
-  RteStateQuery,
-} from '../plugins/rte-plugin';
+  QalmaCommandHandler,
+  QalmaPlugin,
+  QalmaQuery,
+  QalmaStateQuery,
+} from '../plugins/qalma-plugin';
 
 export function createBasePlugins(
   schema: Schema,
-  rtePlugins: readonly RtePlugin[],
+  qalmaPlugins: readonly QalmaPlugin[],
 ): ProseMirrorPlugin[] {
-  const shortcuts = createShortcutRegistry(schema, rtePlugins);
+  const shortcuts = createShortcutRegistry(schema, qalmaPlugins);
 
   return [
-    ...rtePlugins.flatMap(
+    ...qalmaPlugins.flatMap(
       (plugin) => plugin.prosemirrorPlugins?.(schema) ?? [],
     ),
     ...(Object.keys(shortcuts).length > 0 ? [keymap(shortcuts)] : []),
@@ -27,17 +27,17 @@ export function createBasePlugins(
 
 export function createCommandRegistry(
   schema: Schema,
-  rtePlugins: readonly RtePlugin[],
-): Record<string, RteCommandHandler> {
-  const commands: Record<string, RteCommandHandler> = {};
+  qalmaPlugins: readonly QalmaPlugin[],
+): Record<string, QalmaCommandHandler> {
+  const commands: Record<string, QalmaCommandHandler> = {};
 
-  for (const plugin of rtePlugins) {
+  for (const plugin of qalmaPlugins) {
     for (const [name, command] of Object.entries(
       plugin.commands?.(schema) ?? {},
     )) {
       if (commands[name]) {
         throw new Error(
-          `RTE plugin "${plugin.key}" defines duplicate command "${name}".`,
+          `QALMA plugin "${plugin.key}" defines duplicate command "${name}".`,
         );
       }
 
@@ -50,17 +50,17 @@ export function createCommandRegistry(
 
 export function createCommandStateRegistry(
   schema: Schema,
-  rtePlugins: readonly RtePlugin[],
-): Record<string, RteStateQuery> {
-  const states: Record<string, RteStateQuery> = {};
+  qalmaPlugins: readonly QalmaPlugin[],
+): Record<string, QalmaStateQuery> {
+  const states: Record<string, QalmaStateQuery> = {};
 
-  for (const plugin of rtePlugins) {
+  for (const plugin of qalmaPlugins) {
     for (const [commandName, query] of Object.entries(
       plugin.commandStates?.(schema) ?? {},
     )) {
       if (states[commandName]) {
         throw new Error(
-          `RTE plugin "${plugin.key}" defines duplicate command state "${commandName}".`,
+          `QALMA plugin "${plugin.key}" defines duplicate command state "${commandName}".`,
         );
       }
 
@@ -73,17 +73,17 @@ export function createCommandStateRegistry(
 
 export function createQueryRegistry(
   schema: Schema,
-  rtePlugins: readonly RtePlugin[],
-): Partial<Record<string, RteQuery>> {
-  const queries: Partial<Record<string, RteQuery>> = {};
+  qalmaPlugins: readonly QalmaPlugin[],
+): Partial<Record<string, QalmaQuery>> {
+  const queries: Partial<Record<string, QalmaQuery>> = {};
 
-  for (const plugin of rtePlugins) {
+  for (const plugin of qalmaPlugins) {
     for (const [name, query] of Object.entries(
       plugin.queries?.(schema) ?? {},
     )) {
       if (queries[name]) {
         throw new Error(
-          `RTE plugin "${plugin.key}" defines duplicate query "${name}".`,
+          `QALMA plugin "${plugin.key}" defines duplicate query "${name}".`,
         );
       }
 
@@ -96,17 +96,17 @@ export function createQueryRegistry(
 
 function createShortcutRegistry(
   schema: Schema,
-  rtePlugins: readonly RtePlugin[],
+  qalmaPlugins: readonly QalmaPlugin[],
 ): Record<string, Command> {
   const shortcuts: Record<string, Command> = {};
 
-  for (const plugin of rtePlugins) {
+  for (const plugin of qalmaPlugins) {
     for (const [shortcut, command] of Object.entries(
       plugin.shortcuts?.(schema) ?? {},
     )) {
       if (shortcuts[shortcut]) {
         throw new Error(
-          `RTE plugin "${plugin.key}" defines duplicate shortcut "${shortcut}".`,
+          `QALMA plugin "${plugin.key}" defines duplicate shortcut "${shortcut}".`,
         );
       }
 

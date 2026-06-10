@@ -1,11 +1,11 @@
 import { InjectionToken, Signal } from '@angular/core';
 
-import { RteEditorController } from './rte-editor-controller';
+import { QalmaEditorController } from './qalma-editor-controller';
 
-export interface RteEditorContext {
-  readonly editor: Signal<RteEditorController>;
+export interface QalmaEditorContext {
+  readonly editor: Signal<QalmaEditorController>;
 }
 
-export const RTE_EDITOR_CONTEXT = new InjectionToken<RteEditorContext>(
-  'RTE_EDITOR_CONTEXT',
+export const QALMA_EDITOR_CONTEXT = new InjectionToken<QalmaEditorContext>(
+  'QALMA_EDITOR_CONTEXT',
 );

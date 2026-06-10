@@ -6,16 +6,16 @@ import {
 } from 'prosemirror-state';
 import { EditorView } from 'prosemirror-view';
 
-import { createRtePlugin, RtePlugin } from './rte-plugin';
+import { createQalmaPlugin, QalmaPlugin } from './qalma-plugin';
 
-export const TrailingParagraphPlugin = createRtePlugin({
+export const TrailingParagraphPlugin = createQalmaPlugin({
   key: 'trailingParagraph',
   prosemirrorPlugins: (schema) => [
     createTrailingParagraphProseMirrorPlugin(schema.nodes['paragraph']),
   ],
 });
 
-export const TrailingParagraphKit: readonly RtePlugin[] = [
+export const TrailingParagraphKit: readonly QalmaPlugin[] = [
   TrailingParagraphPlugin,
 ];
 

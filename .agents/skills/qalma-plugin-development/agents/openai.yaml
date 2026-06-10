@@ -1,0 +1,4 @@
+interface:
+  display_name: 'Qalma Plugin Development'
+  short_description: 'Build Qalma plugins end to end'
+  default_prompt: 'Implement a new Qalma plugin using the repository plugin workflow.'

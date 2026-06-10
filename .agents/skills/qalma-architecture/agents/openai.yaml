@@ -1,0 +1,4 @@
+interface:
+  display_name: 'Qalma Architecture'
+  short_description: 'Guide architecture and product decisions for Qalma'
+  default_prompt: 'Apply the Qalma architecture and product vision to this repository decision.'

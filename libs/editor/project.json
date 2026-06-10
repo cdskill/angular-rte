@@ -2,7 +2,7 @@
   "name": "editor",
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "libs/editor/src",
-  "prefix": "rte",
+  "prefix": "qalma",
   "projectType": "library",
   "tags": [],
   "targets": {

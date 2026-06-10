@@ -5,11 +5,11 @@ import {
 } from 'prosemirror-state';
 
 import {
-  createConfigurableRtePlugin,
-  createRtePlugin,
-  RteCommandHandler,
-  RtePlugin,
-} from './rte-plugin';
+  createConfigurableQalmaPlugin,
+  createQalmaPlugin,
+  QalmaCommandHandler,
+  QalmaPlugin,
+} from './qalma-plugin';
 
 export interface MentionCommandValue {
   id: string;
@@ -39,7 +39,7 @@ export const MENTION_PLUGIN_DEFAULT_OPTIONS: Readonly<MentionPluginOptions> =
     appendSpaceOnInsert: true,
   });
 
-export const MentionPlugin = createConfigurableRtePlugin(
+export const MentionPlugin = createConfigurableQalmaPlugin(
   MENTION_PLUGIN_DEFAULT_OPTIONS,
   (options) => {
     assertMentionPluginOptions(options);
@@ -56,7 +56,7 @@ export const MentionPlugin = createConfigurableRtePlugin(
       selectable: false,
       parseDOM: [
         {
-          tag: 'span[data-rte-mention]',
+          tag: 'span[data-qalma-mention]',
           getAttrs: (node) => {
             if (!(node instanceof HTMLElement)) {
               return false;
@@ -85,7 +85,7 @@ export const MentionPlugin = createConfigurableRtePlugin(
         const trigger = normalizeTrigger(node.attrs['trigger']);
         const label = normalizeMentionText(node.attrs['label']) ?? '';
         const attrs: Record<string, string> = {
-          'data-rte-mention': '',
+          'data-qalma-mention': '',
           'data-mention-id': String(node.attrs['id']),
           'data-mention-label': label,
           'data-mention-trigger': trigger,
@@ -96,7 +96,7 @@ export const MentionPlugin = createConfigurableRtePlugin(
       },
     };
 
-    return createRtePlugin({
+    return createQalmaPlugin({
       key: 'mention',
       nodes: {
         mention: mentionNode,
@@ -115,12 +115,12 @@ export const MentionPlugin = createConfigurableRtePlugin(
   },
 );
 
-export const MentionKit: readonly RtePlugin[] = [MentionPlugin];
+export const MentionKit: readonly QalmaPlugin[] = [MentionPlugin];
 
 function createInsertMentionCommand(
   mention: NodeType,
   options: Readonly<MentionPluginOptions>,
-): RteCommandHandler {
+): QalmaCommandHandler {
   return (state, dispatch, _view, value) => {
     const attrs = resolveMentionAttrs(value, options);
     const range = getMentionState(state, options) ?? {
@@ -175,7 +175,7 @@ function createMentionInteractionPlugin(
           return false;
         }
 
-        const mentionEvent = new CustomEvent('rte-mention-keydown', {
+        const mentionEvent = new CustomEvent('qalma-mention-keydown', {
           bubbles: true,
           cancelable: true,
           detail: {
@@ -197,7 +197,7 @@ function createMentionInteractionPlugin(
     view: (view) => ({
       update: () => {
         view.dom.dispatchEvent(
-          new CustomEvent('rte-mention-update', {
+          new CustomEvent('qalma-mention-update', {
             bubbles: true,
           }),
         );
@@ -219,7 +219,7 @@ function isMentionNavigationKey(key: string): boolean {
 }
 
 function getMentionState(
-  state: Parameters<RteCommandHandler>[0],
+  state: Parameters<QalmaCommandHandler>[0],
   options: Readonly<MentionPluginOptions>,
 ): MentionState | null {
   if (!state.selection.empty) {
@@ -302,7 +302,7 @@ function isMentionCommandValue(value: unknown): value is MentionCommandValue {
 }
 
 function selectionAllowsMention(
-  state: Parameters<RteCommandHandler>[0],
+  state: Parameters<QalmaCommandHandler>[0],
   mention: NodeType,
   from: number,
   to: number,

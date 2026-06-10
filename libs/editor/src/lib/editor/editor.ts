@@ -5,24 +5,24 @@ import {
   input,
 } from '@angular/core';
 
-import { RTE_EDITOR_CONTEXT, RteEditorContext } from './editor-context';
-import { RteEditorController } from './rte-editor-controller';
+import { QALMA_EDITOR_CONTEXT, QalmaEditorContext } from './editor-context';
+import { QalmaEditorController } from './qalma-editor-controller';
 
 @Component({
-  selector: 'rte-editor',
+  selector: 'qalma-editor',
   imports: [],
   providers: [
     {
-      provide: RTE_EDITOR_CONTEXT,
-      useExisting: forwardRef(() => RteEditor),
+      provide: QALMA_EDITOR_CONTEXT,
+      useExisting: forwardRef(() => QalmaEditor),
     },
   ],
   template: `<ng-content />`,
   host: {
-    '[class.rte-editor]': 'true',
+    '[class.qalma-editor]': 'true',
   },
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class RteEditor implements RteEditorContext {
-  readonly editor = input.required<RteEditorController>();
+export class QalmaEditor implements QalmaEditorContext {
+  readonly editor = input.required<QalmaEditorController>();
 }

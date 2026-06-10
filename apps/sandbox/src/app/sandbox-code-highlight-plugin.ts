@@ -1,4 +1,4 @@
-import { createRtePlugin } from '@angular-rte/editor';
+import { createQalmaPlugin } from '@qalma/editor';
 import { lucideCheck, lucideCopy, lucideTextSelect } from '@ng-icons/lucide';
 import csharp from 'highlight.js/lib/languages/csharp';
 import go from 'highlight.js/lib/languages/go';
@@ -30,7 +30,7 @@ const lowlight = createLowlight({
 
 const codeHighlightKey = new PluginKey<DecorationSet>('sandboxCodeHighlight');
 
-export const SandboxCodeHighlightPlugin = createRtePlugin({
+export const SandboxCodeHighlightPlugin = createQalmaPlugin({
   key: 'sandboxCodeHighlight',
   prosemirrorPlugins: (schema) => {
     const codeBlock = schema.nodes['codeBlock'];

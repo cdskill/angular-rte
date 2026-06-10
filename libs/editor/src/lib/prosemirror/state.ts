@@ -1,17 +1,17 @@
 import { Schema } from 'prosemirror-model';
 import { EditorState } from 'prosemirror-state';
 
-import { RtePlugin } from '../plugins/rte-plugin';
+import { QalmaPlugin } from '../plugins/qalma-plugin';
 import { parseHtmlDocument } from './html';
 import { createBasePlugins } from './plugins';
 
-interface RteStateOptions {
+interface QalmaStateOptions {
   html: string;
-  plugins: readonly RtePlugin[];
+  plugins: readonly QalmaPlugin[];
   schema: Schema;
 }
 
-export function createRteState(options: RteStateOptions): EditorState {
+export function createQalmaState(options: QalmaStateOptions): EditorState {
   return EditorState.create({
     doc: parseHtmlDocument(options.html, options.schema),
     schema: options.schema,

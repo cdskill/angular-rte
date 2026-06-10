@@ -4,11 +4,11 @@
 
 Inspect these files before implementing because the code may evolve:
 
-- `libs/editor/src/lib/plugins/rte-plugin.ts`
+- `libs/editor/src/lib/plugins/qalma-plugin.ts`
 - `libs/editor/src/lib/prosemirror/schema.ts`
 - `libs/editor/src/lib/prosemirror/plugins.ts`
 - `libs/editor/src/lib/prosemirror/state.ts`
-- `libs/editor/src/lib/editor/rte-editor-controller.ts`
+- `libs/editor/src/lib/editor/qalma-editor-controller.ts`
 - `libs/editor/src/lib/editor/command.ts`
 - `libs/editor/src/index.ts`
 
@@ -19,7 +19,7 @@ as the configurable engine-plugin example.
 
 | Field                        | Use                                                       |
 | ---------------------------- | --------------------------------------------------------- |
-| `key`                        | Stable unique identity for the Angular RTE plugin.        |
+| `key`                        | Stable unique identity for the Qalma plugin.        |
 | `nodes`                      | Add optional ProseMirror node specs to the editor schema. |
 | `extendNodes(nodes)`         | Return amended specs for existing schema nodes.           |
 | `marks`                      | Add optional ProseMirror mark specs to the editor schema. |
@@ -53,7 +53,7 @@ A mark plugin normally needs:
 4. A read-only query when consumer UI needs attributes or ranges from the
    current document state.
 5. Conventional shortcuts when they exist.
-6. A consumer-composed sandbox button using `rteCommand`.
+6. A consumer-composed sandbox button using `qalmaCommand`.
 
 Account for both semantic HTML tags and relevant pasted inline styles when
 defining `parseDOM`. Serialize to predictable semantic HTML.
@@ -83,7 +83,7 @@ need to interact with that behavior.
 
 ## Public API
 
-Export the plugin and any intentional Angular RTE-owned option or default types.
+Export the plugin and any intentional Qalma-owned option or default types.
 Keep internal `MarkSpec`, `NodeSpec`, helper commands, assertions, queries, and
 raw ProseMirror adapters private unless a consumer use case requires them.
 
@@ -92,13 +92,13 @@ raw ProseMirror adapters private unless a consumer use case requires them.
 The sandbox is a consumer, not privileged library code:
 
 ```ts
-const editor = createRteEditor({
+const editor = createQalmaEditor({
   plugins: [ExamplePlugin],
 });
 ```
 
 ```html
-<button type="button" rteCommand="exampleCommand">Example</button>
+<button type="button" qalmaCommand="exampleCommand">Example</button>
 ```
 
 If a plugin works only through internal imports or library-rendered UI, its

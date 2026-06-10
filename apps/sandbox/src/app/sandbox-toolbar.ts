@@ -6,10 +6,10 @@ import {
   output,
 } from '@angular/core';
 import {
-  RteCommand,
-  RteEditorController,
-  RteToolbar,
-} from '@angular-rte/editor';
+  QalmaCommand,
+  QalmaEditorController,
+  QalmaToolbar,
+} from '@qalma/editor';
 import { NgIcon, provideIcons } from '@ng-icons/core';
 import {
   lucideAlignCenter,
@@ -53,7 +53,7 @@ import {
 
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [NgIcon, RteCommand, RteToolbar],
+  imports: [NgIcon, QalmaCommand, QalmaToolbar],
   providers: [
     provideIcons({
       lucideAlignCenter,
@@ -88,13 +88,13 @@ import {
   ],
   selector: 'app-sandbox-toolbar',
   template: `
-    <rte-toolbar
+    <qalma-toolbar
       class="flex flex-wrap items-center gap-1.5 border-b border-slate-200 bg-slate-50 p-2"
     >
       <button
         type="button"
         [class]="commandClass"
-        rteCommand="setParagraph"
+        qalmaCommand="setParagraph"
         title="Paragraph"
         aria-label="Paragraph"
       >
@@ -103,7 +103,7 @@ import {
       <button
         type="button"
         [class]="commandClass"
-        rteCommand="toggleHeading1"
+        qalmaCommand="toggleHeading1"
         title="Heading 1"
         aria-label="Heading 1"
       >
@@ -112,7 +112,7 @@ import {
       <button
         type="button"
         [class]="commandClass"
-        rteCommand="toggleHeading2"
+        qalmaCommand="toggleHeading2"
         title="Heading 2"
         aria-label="Heading 2"
       >
@@ -121,7 +121,7 @@ import {
       <button
         type="button"
         [class]="commandClass"
-        rteCommand="toggleHeading3"
+        qalmaCommand="toggleHeading3"
         title="Heading 3"
         aria-label="Heading 3"
       >
@@ -131,7 +131,7 @@ import {
       <button
         type="button"
         [class]="commandClass"
-        [class.rte-command-active]="imageActive()"
+        [class.qalma-command-active]="imageActive()"
         [attr.aria-pressed]="imageActive()"
         [disabled]="!canInsertImage()"
         (mousedown)="preserveSelection($event)"
@@ -156,7 +156,7 @@ import {
       <button
         type="button"
         [class]="commandClass"
-        rteCommand="setTextAlignLeft"
+        qalmaCommand="setTextAlignLeft"
         title="Align left"
         aria-label="Align left"
       >
@@ -165,7 +165,7 @@ import {
       <button
         type="button"
         [class]="commandClass"
-        rteCommand="setTextAlignCenter"
+        qalmaCommand="setTextAlignCenter"
         title="Align center"
         aria-label="Align center"
       >
@@ -174,7 +174,7 @@ import {
       <button
         type="button"
         [class]="commandClass"
-        rteCommand="setTextAlignRight"
+        qalmaCommand="setTextAlignRight"
         title="Align right"
         aria-label="Align right"
       >
@@ -183,7 +183,7 @@ import {
       <button
         type="button"
         [class]="commandClass"
-        rteCommand="setTextAlignJustify"
+        qalmaCommand="setTextAlignJustify"
         title="Justify"
         aria-label="Justify"
       >
@@ -193,7 +193,7 @@ import {
       <button
         type="button"
         [class]="commandClass"
-        rteCommand="toggleBold"
+        qalmaCommand="toggleBold"
         title="Bold"
         aria-label="Bold"
       >
@@ -202,7 +202,7 @@ import {
       <button
         type="button"
         [class]="commandClass"
-        rteCommand="toggleItalic"
+        qalmaCommand="toggleItalic"
         title="Italic"
         aria-label="Italic"
       >
@@ -211,7 +211,7 @@ import {
       <button
         type="button"
         [class]="commandClass"
-        rteCommand="toggleUnderline"
+        qalmaCommand="toggleUnderline"
         title="Underline"
         aria-label="Underline"
       >
@@ -220,7 +220,7 @@ import {
       <button
         type="button"
         [class]="commandClass"
-        rteCommand="toggleStrike"
+        qalmaCommand="toggleStrike"
         title="Strikethrough"
         aria-label="Strikethrough"
       >
@@ -229,7 +229,7 @@ import {
       <button
         type="button"
         [class]="commandClass"
-        rteCommand="toggleSubscript"
+        qalmaCommand="toggleSubscript"
         title="Subscript"
         aria-label="Subscript"
       >
@@ -238,7 +238,7 @@ import {
       <button
         type="button"
         [class]="commandClass"
-        rteCommand="toggleSuperscript"
+        qalmaCommand="toggleSuperscript"
         title="Superscript"
         aria-label="Superscript"
       >
@@ -248,7 +248,7 @@ import {
       <button
         type="button"
         [class]="commandClass"
-        rteCommand="setHighlight"
+        qalmaCommand="setHighlight"
         title="Highlight"
         aria-label="Highlight"
       >
@@ -258,7 +258,7 @@ import {
         <button
           type="button"
           [class]="colorSwatchClass"
-          [class.rte-command-active]="isHighlightColorActive(color.value)"
+          [class.qalma-command-active]="isHighlightColorActive(color.value)"
           [attr.aria-pressed]="isHighlightColorActive(color.value)"
           [disabled]="!canSetHighlight(color.value)"
           (mousedown)="preserveSelection($event)"
@@ -276,7 +276,7 @@ import {
       <button
         type="button"
         [class]="commandClass"
-        rteCommand="unsetHighlight"
+        qalmaCommand="unsetHighlight"
         title="Clear highlight"
         aria-label="Clear highlight"
       >
@@ -287,7 +287,7 @@ import {
         <button
           type="button"
           [class]="colorSwatchClass"
-          [class.rte-command-active]="isTextColorActive(color.value)"
+          [class.qalma-command-active]="isTextColorActive(color.value)"
           [attr.aria-pressed]="isTextColorActive(color.value)"
           [disabled]="!canSetTextColor(color.value)"
           (mousedown)="preserveSelection($event)"
@@ -317,7 +317,7 @@ import {
         <button
           type="button"
           [class]="colorSwatchClass"
-          [class.rte-command-active]="isBackgroundColorActive(color.value)"
+          [class.qalma-command-active]="isBackgroundColorActive(color.value)"
           [attr.aria-pressed]="isBackgroundColorActive(color.value)"
           [disabled]="!canSetBackgroundColor(color.value)"
           (mousedown)="preserveSelection($event)"
@@ -346,7 +346,7 @@ import {
       <button
         type="button"
         [class]="commandClass"
-        rteCommand="clearFormatting"
+        qalmaCommand="clearFormatting"
         title="Clear formatting"
         aria-label="Clear formatting"
       >
@@ -356,7 +356,7 @@ import {
       <button
         type="button"
         [class]="commandClass"
-        rteCommand="toggleBulletList"
+        qalmaCommand="toggleBulletList"
         title="Bullet list"
         aria-label="Bullet list"
       >
@@ -365,7 +365,7 @@ import {
       <button
         type="button"
         [class]="commandClass"
-        rteCommand="toggleOrderedList"
+        qalmaCommand="toggleOrderedList"
         title="Ordered list"
         aria-label="Ordered list"
       >
@@ -374,7 +374,7 @@ import {
       <button
         type="button"
         [class]="commandClass"
-        rteCommand="toggleBlockquote"
+        qalmaCommand="toggleBlockquote"
         title="Blockquote"
         aria-label="Blockquote"
       >
@@ -383,7 +383,7 @@ import {
       <button
         type="button"
         [class]="commandClass"
-        rteCommand="toggleCodeBlock"
+        qalmaCommand="toggleCodeBlock"
         title="Code block"
         aria-label="Code block"
       >
@@ -409,7 +409,7 @@ import {
       <button
         type="button"
         [class]="commandClass"
-        rteCommand="liftListItem"
+        qalmaCommand="liftListItem"
         title="Lift list item"
         aria-label="Lift list item"
       >
@@ -418,7 +418,7 @@ import {
       <button
         type="button"
         [class]="commandClass"
-        rteCommand="sinkListItem"
+        qalmaCommand="sinkListItem"
         title="Sink list item"
         aria-label="Sink list item"
       >
@@ -428,7 +428,7 @@ import {
       <button
         type="button"
         [class]="commandClass"
-        [class.rte-command-active]="linkActive()"
+        [class.qalma-command-active]="linkActive()"
         [attr.aria-pressed]="linkActive()"
         [disabled]="!canSetLink()"
         (mousedown)="preserveSelection($event)"
@@ -441,7 +441,7 @@ import {
       <button
         type="button"
         [class]="commandClass"
-        rteCommand="unsetLink"
+        qalmaCommand="unsetLink"
         title="Unlink"
         aria-label="Unlink"
       >
@@ -451,7 +451,7 @@ import {
       <button
         type="button"
         [class]="commandClass"
-        rteCommand="undo"
+        qalmaCommand="undo"
         title="Undo"
         aria-label="Undo"
       >
@@ -460,17 +460,17 @@ import {
       <button
         type="button"
         [class]="commandClass"
-        rteCommand="redo"
+        qalmaCommand="redo"
         title="Redo"
         aria-label="Redo"
       >
         <ng-icon name="lucideRedo2" aria-hidden="true" />
       </button>
-    </rte-toolbar>
+    </qalma-toolbar>
   `,
 })
 export class SandboxToolbar {
-  readonly editor = input.required<RteEditorController>();
+  readonly editor = input.required<QalmaEditorController>();
   readonly requestLink = output<MouseEvent>();
   readonly requestImageLink = output<void>();
   readonly requestImageUpload = output<void>();
@@ -534,9 +534,9 @@ export class SandboxToolbar {
     { label: 'Pink background color', value: 'rgb(251, 207, 232)' },
   ] as const;
   protected readonly commandClass =
-    'inline-flex h-8 w-8 items-center justify-center rounded-md border border-slate-300 bg-white text-slate-700 transition hover:border-sky-600 hover:bg-sky-50 hover:text-sky-900 disabled:cursor-not-allowed disabled:opacity-45 [&.rte-command-active]:border-sky-600 [&.rte-command-active]:bg-sky-50 [&.rte-command-active]:text-sky-900';
+    'inline-flex h-8 w-8 items-center justify-center rounded-md border border-slate-300 bg-white text-slate-700 transition hover:border-sky-600 hover:bg-sky-50 hover:text-sky-900 disabled:cursor-not-allowed disabled:opacity-45 [&.qalma-command-active]:border-sky-600 [&.qalma-command-active]:bg-sky-50 [&.qalma-command-active]:text-sky-900';
   protected readonly colorSwatchClass =
-    'inline-flex h-8 w-8 items-center justify-center rounded-md border border-slate-300 bg-white transition hover:border-sky-600 hover:bg-sky-50 disabled:cursor-not-allowed disabled:opacity-45 [&.rte-command-active]:border-sky-600 [&.rte-command-active]:bg-sky-50';
+    'inline-flex h-8 w-8 items-center justify-center rounded-md border border-slate-300 bg-white transition hover:border-sky-600 hover:bg-sky-50 disabled:cursor-not-allowed disabled:opacity-45 [&.qalma-command-active]:border-sky-600 [&.qalma-command-active]:bg-sky-50';
   protected readonly languageSelectClass =
     'h-8 rounded-md border border-slate-300 bg-white px-2 text-xs font-medium text-slate-700 transition hover:border-sky-600 hover:bg-sky-50 hover:text-sky-900 focus:border-sky-600 focus:outline-none focus:ring-2 focus:ring-sky-200';
 

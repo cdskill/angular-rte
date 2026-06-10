@@ -8,19 +8,19 @@ import {
   viewChild,
 } from '@angular/core';
 
-import { RTE_EDITOR_CONTEXT } from './editor-context';
+import { QALMA_EDITOR_CONTEXT } from './editor-context';
 
 @Component({
-  selector: 'rte-content',
+  selector: 'qalma-content',
   imports: [],
-  template: `<div #editorHost class="rte-content-surface"></div>`,
+  template: `<div #editorHost class="qalma-content-surface"></div>`,
   host: {
-    '[class.rte-content]': 'true',
+    '[class.qalma-content]': 'true',
   },
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class RteContent {
-  private readonly context = inject(RTE_EDITOR_CONTEXT);
+export class QalmaContent {
+  private readonly context = inject(QALMA_EDITOR_CONTEXT);
   private readonly destroyRef = inject(DestroyRef);
 
   private readonly editorHost =

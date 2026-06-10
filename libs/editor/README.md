@@ -1,9 +1,9 @@
-# @angular-rte/editor
+# @qalma/editor
 
-Headless Angular components and plugin primitives for the Angular RTE editor.
+Headless Angular components and plugin primitives for the Qalma editor.
 
 ```ts
-const editor = createRteEditor({
+const editor = createQalmaEditor({
   plugins: [
     ...TextFormattingKit,
     HistoryPlugin.configure({
@@ -15,13 +15,13 @@ const editor = createRteEditor({
 ```
 
 ```html
-<rte-editor [editor]="editor">
-  <rte-toolbar>
-    <button rteCommand="toggleBold">Bold</button>
-    <button rteCommand="undo">Undo</button>
-    <button rteCommand="redo">Redo</button>
-  </rte-toolbar>
+<qalma-editor [editor]="editor">
+  <qalma-toolbar>
+    <button qalmaCommand="toggleBold">Bold</button>
+    <button qalmaCommand="undo">Undo</button>
+    <button qalmaCommand="redo">Redo</button>
+  </qalma-toolbar>
 
-  <rte-content />
-</rte-editor>
+  <qalma-content />
+</qalma-editor>
 ```

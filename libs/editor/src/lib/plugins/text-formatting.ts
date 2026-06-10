@@ -1,7 +1,7 @@
 import { toggleMark } from 'prosemirror-commands';
 import { MarkSpec } from 'prosemirror-model';
 
-import { createRtePlugin, RtePlugin } from './rte-plugin';
+import { createQalmaPlugin, QalmaPlugin } from './qalma-plugin';
 import { isMarkActive } from '../prosemirror/queries';
 
 const strongMark: MarkSpec = {
@@ -52,7 +52,7 @@ const strikeMark: MarkSpec = {
   toDOM: () => ['s', 0],
 };
 
-export const BoldPlugin = createRtePlugin({
+export const BoldPlugin = createQalmaPlugin({
   key: 'bold',
   marks: {
     strong: strongMark,
@@ -68,7 +68,7 @@ export const BoldPlugin = createRtePlugin({
   }),
 });
 
-export const ItalicPlugin = createRtePlugin({
+export const ItalicPlugin = createQalmaPlugin({
   key: 'italic',
   marks: {
     em: emMark,
@@ -84,7 +84,7 @@ export const ItalicPlugin = createRtePlugin({
   }),
 });
 
-export const UnderlinePlugin = createRtePlugin({
+export const UnderlinePlugin = createQalmaPlugin({
   key: 'underline',
   marks: {
     underline: underlineMark,
@@ -100,7 +100,7 @@ export const UnderlinePlugin = createRtePlugin({
   }),
 });
 
-export const StrikePlugin = createRtePlugin({
+export const StrikePlugin = createQalmaPlugin({
   key: 'strike',
   marks: {
     strike: strikeMark,
@@ -113,7 +113,7 @@ export const StrikePlugin = createRtePlugin({
   }),
 });
 
-export const TextFormattingKit: readonly RtePlugin[] = [
+export const TextFormattingKit: readonly QalmaPlugin[] = [
   BoldPlugin,
   ItalicPlugin,
   UnderlinePlugin,

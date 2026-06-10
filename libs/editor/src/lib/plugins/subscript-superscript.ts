@@ -1,7 +1,7 @@
 import { toggleMark } from 'prosemirror-commands';
 import { MarkSpec } from 'prosemirror-model';
 
-import { createRtePlugin, RtePlugin } from './rte-plugin';
+import { createQalmaPlugin, QalmaPlugin } from './qalma-plugin';
 import { isMarkActive } from '../prosemirror/queries';
 
 const subscriptMark: MarkSpec = {
@@ -28,7 +28,7 @@ const superscriptMark: MarkSpec = {
   toDOM: () => ['sup', 0],
 };
 
-export const SubscriptSuperscriptPlugin = createRtePlugin({
+export const SubscriptSuperscriptPlugin = createQalmaPlugin({
   key: 'subscriptSuperscript',
   marks: {
     subscript: subscriptMark,
@@ -45,6 +45,6 @@ export const SubscriptSuperscriptPlugin = createRtePlugin({
   }),
 });
 
-export const SubscriptSuperscriptKit: readonly RtePlugin[] = [
+export const SubscriptSuperscriptKit: readonly QalmaPlugin[] = [
   SubscriptSuperscriptPlugin,
 ];

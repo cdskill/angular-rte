@@ -1,6 +1,6 @@
 import { MarkSpec, NodeSpec, Schema } from 'prosemirror-model';
 
-import { RtePlugin } from '../plugins/rte-plugin';
+import { QalmaPlugin } from '../plugins/qalma-plugin';
 
 const baseNodes: Record<string, NodeSpec> = {
   doc: {
@@ -17,7 +17,7 @@ const baseNodes: Record<string, NodeSpec> = {
   },
 };
 
-export function createRteSchema(plugins: readonly RtePlugin[]): Schema {
+export function createQalmaSchema(plugins: readonly QalmaPlugin[]): Schema {
   assertUniquePluginKeys(plugins);
 
   const nodes: Record<string, NodeSpec> = { ...baseNodes };
@@ -42,12 +42,12 @@ export function createRteSchema(plugins: readonly RtePlugin[]): Schema {
   });
 }
 
-function assertUniquePluginKeys(plugins: readonly RtePlugin[]): void {
+function assertUniquePluginKeys(plugins: readonly QalmaPlugin[]): void {
   const keys = new Set<string>();
 
   for (const plugin of plugins) {
     if (keys.has(plugin.key)) {
-      throw new Error(`Duplicate RTE plugin key "${plugin.key}".`);
+      throw new Error(`Duplicate QALMA plugin key "${plugin.key}".`);
     }
 
     keys.add(plugin.key);
@@ -63,7 +63,7 @@ function addUniqueEntries<T>(
   for (const [name, spec] of Object.entries(entries ?? {})) {
     if (target[name]) {
       throw new Error(
-        `RTE plugin "${pluginKey}" defines duplicate ${type} "${name}".`,
+        `QALMA plugin "${pluginKey}" defines duplicate ${type} "${name}".`,
       );
     }
 
@@ -79,7 +79,7 @@ function extendExistingNodes(
   for (const [name, spec] of Object.entries(extensions ?? {})) {
     if (!nodes[name]) {
       throw new Error(
-        `RTE plugin "${pluginKey}" extends unknown node "${name}".`,
+        `QALMA plugin "${pluginKey}" extends unknown node "${name}".`,
       );
     }
 

@@ -25,15 +25,15 @@ import {
   PasteRulesPlugin,
   PLACEHOLDER_PLUGIN_DEFAULT_OPTIONS,
   PlaceholderPlugin,
-  RteEditorController,
+  QalmaEditorController,
   SubscriptSuperscriptPlugin,
   TEXT_ALIGN_PLUGIN_DEFAULT_OPTIONS,
   TextAlignPlugin,
   TextFormattingKit,
   TrailingParagraphPlugin,
-  createRteEditor,
-  createRtePlugin,
-} from '@angular-rte/editor';
+  createQalmaEditor,
+  createQalmaPlugin,
+} from '@qalma/editor';
 import { TextSelection } from 'prosemirror-state';
 import { EditorView } from 'prosemirror-view';
 
@@ -90,7 +90,7 @@ describe('App', () => {
     ).not.toBeNull();
     expect(compiled.querySelector('[aria-label="Link URL"]')).toBeNull();
     expect(compiled.querySelector('.ProseMirror')?.textContent).toContain(
-      'Angular RTE',
+      'Qalma',
     );
     expect(compiled.querySelector('.ProseMirror ul')?.textContent).toContain(
       'Compose plugins in TypeScript.',
@@ -106,7 +106,7 @@ describe('App', () => {
     expect(
       compiled.querySelector('.ProseMirror code.language-typescript')
         ?.textContent,
-    ).toContain('createRteEditor');
+    ).toContain('createQalmaEditor');
     expect(
       compiled.querySelector('.ProseMirror code.language-go')?.textContent,
     ).toContain('fmt.Println');
@@ -125,7 +125,7 @@ describe('App', () => {
       )?.textContent,
     ).toContain('color');
     expect(
-      compiled.querySelector('.ProseMirror [data-rte-mention]')?.textContent,
+      compiled.querySelector('.ProseMirror [data-qalma-mention]')?.textContent,
     ).toBe('@Ada Lovelace');
     expect(
       compiled.querySelector<HTMLImageElement>('.ProseMirror img')?.alt,
@@ -205,7 +205,7 @@ describe('App', () => {
   it('should expose code block commands through the public plugin', () => {
     const snippet =
       'const language = "typescript"; const enabled = language.length > 0; console.log({ enabled, language });';
-    const editor = createRteEditor({
+    const editor = createQalmaEditor({
       content: `<p>${snippet}</p>`,
       plugins: [
         CodeBlockPlugin.configure({
@@ -239,9 +239,9 @@ describe('App', () => {
   });
 
   it('should expose clear formatting through the public plugin', () => {
-    const editor = createRteEditor({
+    const editor = createQalmaEditor({
       content:
-        '<h2><strong><em><a href="https://angular.dev">Angular RTE</a></em></strong></h2>',
+        '<h2><strong><em><a href="https://angular.dev">Qalma</a></em></strong></h2>',
       plugins: [
         HeadingsPlugin,
         ...TextFormattingKit,
@@ -257,7 +257,7 @@ describe('App', () => {
     expect(editor.execute('selectLink')).toBeTrue();
     expect(editor.canExecute('clearFormatting')).toBeTrue();
     expect(editor.execute('clearFormatting')).toBeTrue();
-    expect(editor.html()).toBe('<p>Angular RTE</p>');
+    expect(editor.html()).toBe('<p>Qalma</p>');
     expect(editor.canExecute('clearFormatting')).toBeFalse();
     expect(editor.execute('clearFormatting')).toBeFalse();
 
@@ -265,8 +265,8 @@ describe('App', () => {
   });
 
   it('should expose text and background color through the public plugin', () => {
-    const editor = createRteEditor({
-      content: '<p>Angular RTE</p>',
+    const editor = createQalmaEditor({
+      content: '<p>Qalma</p>',
       plugins: [ColorPlugin],
     });
     const host = document.createElement('div');
@@ -280,29 +280,29 @@ describe('App', () => {
     expect(editor.execute('setTextColor', 'rgb(14, 116, 144)')).toBeTrue();
     expect(editor.query<string>('textColor')).toBe('rgb(14, 116, 144)');
     expect(editor.html()).toBe(
-      '<p><span style="color: rgb(14, 116, 144);">Angular RTE</span></p>',
+      '<p><span style="color: rgb(14, 116, 144);">Qalma</span></p>',
     );
     expect(
       editor.execute('setBackgroundColor', 'rgb(254, 240, 138)'),
     ).toBeTrue();
     expect(editor.query<string>('backgroundColor')).toBe('rgb(254, 240, 138)');
     expect(editor.html()).toBe(
-      '<p><span style="color: rgb(14, 116, 144); background-color: rgb(254, 240, 138);">Angular RTE</span></p>',
+      '<p><span style="color: rgb(14, 116, 144); background-color: rgb(254, 240, 138);">Qalma</span></p>',
     );
     expect(editor.execute('unsetTextColor')).toBeTrue();
     expect(editor.html()).toBe(
-      '<p><span style="background-color: rgb(254, 240, 138);">Angular RTE</span></p>',
+      '<p><span style="background-color: rgb(254, 240, 138);">Qalma</span></p>',
     );
     expect(editor.execute('unsetBackgroundColor')).toBeTrue();
-    expect(editor.html()).toBe('<p>Angular RTE</p>');
+    expect(editor.html()).toBe('<p>Qalma</p>');
 
     editor.unmount(host);
   });
 
   it('should parse serialized color marks through the public plugin', () => {
-    const editor = createRteEditor({
+    const editor = createQalmaEditor({
       content:
-        '<p><span style="color: #0e7490; background-color: #fef08a;">Angular RTE</span></p><p><font color="#be123c">Legacy color</font></p>',
+        '<p><span style="color: #0e7490; background-color: #fef08a;">Qalma</span></p><p><font color="#be123c">Legacy color</font></p>',
       plugins: [ColorPlugin],
     });
     const host = document.createElement('div');
@@ -310,14 +310,14 @@ describe('App', () => {
     editor.mount(host);
 
     expect(editor.html()).toBe(
-      '<p><span style="color: rgb(14, 116, 144); background-color: rgb(254, 240, 138);">Angular RTE</span></p><p><span style="color: rgb(190, 18, 60);">Legacy color</span></p>',
+      '<p><span style="color: rgb(14, 116, 144); background-color: rgb(254, 240, 138);">Qalma</span></p><p><span style="color: rgb(190, 18, 60);">Legacy color</span></p>',
     );
 
     editor.unmount(host);
   });
 
   it('should expose image commands and state through the public plugin', () => {
-    const editor = createRteEditor({
+    const editor = createQalmaEditor({
       content: '<p>Before</p>',
       plugins: [ImagePlugin],
     });
@@ -367,7 +367,7 @@ describe('App', () => {
   });
 
   it('should keep image upload previews out of serialized HTML', () => {
-    const editor = createRteEditor({
+    const editor = createQalmaEditor({
       content: '<p>Before</p>',
       plugins: [ImagePlugin],
     });
@@ -395,7 +395,7 @@ describe('App', () => {
   });
 
   it('should parse serialized images through the public plugin', () => {
-    const editor = createRteEditor({
+    const editor = createQalmaEditor({
       content:
         '<img src="https://example.com/photo.png" alt="Example" title="Photo"><img src="javascript:alert(1)" alt="Bad">',
       plugins: [ImagePlugin],
@@ -412,7 +412,7 @@ describe('App', () => {
   });
 
   it('should expose subscript and superscript through the public plugin', () => {
-    const editor = createRteEditor({
+    const editor = createQalmaEditor({
       content: '<p>H2O and E=mc2</p>',
       plugins: [SubscriptSuperscriptPlugin],
     });
@@ -442,7 +442,7 @@ describe('App', () => {
   });
 
   it('should parse serialized subscript and superscript marks', () => {
-    const editor = createRteEditor({
+    const editor = createQalmaEditor({
       content:
         '<p>Formula H<sub>2</sub>O and E=mc<sup>2</sup></p><p><span style="vertical-align: sub;">sub</span> <span style="vertical-align: super;">sup</span></p>',
       plugins: [SubscriptSuperscriptPlugin],
@@ -459,8 +459,8 @@ describe('App', () => {
   });
 
   it('should expose highlight through the public plugin', () => {
-    const editor = createRteEditor({
-      content: '<p>Angular RTE</p>',
+    const editor = createQalmaEditor({
+      content: '<p>Qalma</p>',
       plugins: [HighlightPlugin],
     });
     const host = document.createElement('div');
@@ -474,20 +474,20 @@ describe('App', () => {
     expect(editor.execute('setHighlight')).toBeTrue();
     expect(editor.isCommandActive('setHighlight')).toBeTrue();
     expect(editor.query<string>('highlightColor')).toBe('rgb(254, 240, 138)');
-    expect(editor.html()).toBe('<p><mark>Angular RTE</mark></p>');
+    expect(editor.html()).toBe('<p><mark>Qalma</mark></p>');
     expect(editor.execute('setHighlight', 'rgb(186, 230, 253)')).toBeTrue();
     expect(editor.query<string>('highlightColor')).toBe('rgb(186, 230, 253)');
     expect(editor.html()).toBe(
-      '<p><mark style="background-color: rgb(186, 230, 253);">Angular RTE</mark></p>',
+      '<p><mark style="background-color: rgb(186, 230, 253);">Qalma</mark></p>',
     );
     expect(editor.execute('unsetHighlight')).toBeTrue();
-    expect(editor.html()).toBe('<p>Angular RTE</p>');
+    expect(editor.html()).toBe('<p>Qalma</p>');
 
     editor.unmount(host);
   });
 
   it('should parse serialized highlights through the public plugin', () => {
-    const editor = createRteEditor({
+    const editor = createQalmaEditor({
       content:
         '<p><mark>Default highlight</mark></p><p><mark style="background-color: #bae6fd;">Sky highlight</mark></p>',
       plugins: [HighlightPlugin],
@@ -504,7 +504,7 @@ describe('App', () => {
   });
 
   it('should expose placeholder decorations through the public plugin', () => {
-    const editor = createRteEditor({
+    const editor = createQalmaEditor({
       content: '<p></p>',
       plugins: [
         PlaceholderPlugin.configure({
@@ -525,18 +525,18 @@ describe('App', () => {
     expect(placeholder?.tagName).toBe('P');
     expect(editor.html()).toBe('<p></p>');
 
-    editor.setHtml('<p>Angular RTE</p>');
+    editor.setHtml('<p>Qalma</p>');
 
     expect(
       host.querySelector('.custom-placeholder[data-placeholder="Start here"]'),
     ).toBeNull();
-    expect(editor.html()).toBe('<p>Angular RTE</p>');
+    expect(editor.html()).toBe('<p>Qalma</p>');
 
     editor.unmount(host);
   });
 
   it('should expose trailing paragraph behavior through the public plugin', async () => {
-    const editor = createRteEditor({
+    const editor = createQalmaEditor({
       content:
         '<pre><code class="language-typescript">const answer = 42;</code></pre>',
       plugins: [
@@ -557,15 +557,15 @@ describe('App', () => {
       '<pre><code class="language-typescript">const answer = 42;</code></pre><p></p>',
     );
 
-    editor.setHtml('<p>Angular RTE</p>');
+    editor.setHtml('<p>Qalma</p>');
     await flushMicrotasks();
 
-    expect(editor.html()).toBe('<p>Angular RTE</p><p></p>');
+    expect(editor.html()).toBe('<p>Qalma</p><p></p>');
 
-    editor.setHtml('<p>Angular RTE</p><p></p>');
+    editor.setHtml('<p>Qalma</p><p></p>');
     await flushMicrotasks();
 
-    expect(editor.html()).toBe('<p>Angular RTE</p><p></p>');
+    expect(editor.html()).toBe('<p>Qalma</p><p></p>');
 
     editor.setHtml('<p></p>');
     await flushMicrotasks();
@@ -576,7 +576,7 @@ describe('App', () => {
   });
 
   it('should clear code block formatting to a paragraph', () => {
-    const editor = createRteEditor({
+    const editor = createQalmaEditor({
       content:
         '<pre><code class="language-typescript">const answer = 42;</code></pre>',
       plugins: [
@@ -600,8 +600,8 @@ describe('App', () => {
   });
 
   it('should expose hard break commands through the public plugin', () => {
-    const editor = createRteEditor({
-      content: '<p>Angular RTE</p>',
+    const editor = createQalmaEditor({
+      content: '<p>Qalma</p>',
       plugins: [HardBreakPlugin],
     });
     const host = document.createElement('div');
@@ -611,13 +611,13 @@ describe('App', () => {
     expect(HardBreakPlugin.key).toBe('hardBreak');
     expect(editor.canExecute('insertHardBreak')).toBeTrue();
     expect(editor.execute('insertHardBreak')).toBeTrue();
-    expect(editor.html()).toBe('<p><br>Angular RTE</p>');
+    expect(editor.html()).toBe('<p><br>Qalma</p>');
 
     editor.unmount(host);
   });
 
   it('should parse serialized hard breaks through the public plugin', () => {
-    const editor = createRteEditor({
+    const editor = createQalmaEditor({
       content: '<p>Line one<br>Line two</p>',
       plugins: [HardBreakPlugin],
     });
@@ -631,8 +631,8 @@ describe('App', () => {
   });
 
   it('should insert hard breaks with Shift+Enter', () => {
-    const editor = createRteEditor({
-      content: '<p>Angular RTE</p>',
+    const editor = createQalmaEditor({
+      content: '<p>Qalma</p>',
       plugins: [HardBreakPlugin],
     });
     const host = document.createElement('div');
@@ -650,13 +650,13 @@ describe('App', () => {
     surface?.dispatchEvent(shiftEnterEvent);
 
     expect(shiftEnterEvent.defaultPrevented).toBeTrue();
-    expect(editor.html()).toBe('<p><br>Angular RTE</p>');
+    expect(editor.html()).toBe('<p><br>Qalma</p>');
 
     editor.unmount(host);
   });
 
   it('should keep Shift+Enter out of code blocks', () => {
-    const editor = createRteEditor({
+    const editor = createQalmaEditor({
       content:
         '<pre><code class="language-typescript">const answer = 42;</code></pre>',
       plugins: [
@@ -691,7 +691,7 @@ describe('App', () => {
   });
 
   it('should preserve code block line breaks when clearing formatting with hard breaks enabled', () => {
-    const editor = createRteEditor({
+    const editor = createQalmaEditor({
       content:
         '<pre><code class="language-typescript">const first = 1;&#10;const second = 2;</code></pre>',
       plugins: [
@@ -720,10 +720,10 @@ describe('App', () => {
       'import "fmt"',
       '',
       'func main() {',
-      '  fmt.Println("Angular RTE")',
+      '  fmt.Println("Qalma")',
       '}',
     ].join('\n');
-    const editor = createRteEditor({
+    const editor = createQalmaEditor({
       content: `<pre><code class="language-go">${snippet}</code></pre>`,
       plugins: [
         CodeBlockPlugin.configure({
@@ -748,7 +748,7 @@ describe('App', () => {
   });
 
   it('should keep Tab inside code blocks for indentation', () => {
-    const editor = createRteEditor({
+    const editor = createQalmaEditor({
       content:
         '<pre><code class="language-typescript">const answer = 42;</code></pre>',
       plugins: [
@@ -842,7 +842,7 @@ describe('App', () => {
   });
 
   it('should expose blockquote commands through the public plugin', () => {
-    const editor = createRteEditor({
+    const editor = createQalmaEditor({
       content: '<p>Quoted text</p>',
       plugins: [BlockquotePlugin],
     });
@@ -862,7 +862,7 @@ describe('App', () => {
   });
 
   it('should expose text alignment through the public plugin', () => {
-    const editor = createRteEditor({
+    const editor = createQalmaEditor({
       content: '<p>Aligned text</p>',
       plugins: [TextAlignPlugin, HeadingsPlugin],
     });
@@ -896,7 +896,7 @@ describe('App', () => {
   });
 
   it('should align list items and blockquotes at the container level', () => {
-    const editor = createRteEditor({
+    const editor = createQalmaEditor({
       content:
         '<ul><li><p>Aligned list item</p></li></ul><blockquote><p>Aligned quote</p></blockquote>',
       plugins: [TextAlignPlugin, ListsPlugin, BlockquotePlugin],
@@ -955,16 +955,16 @@ describe('App', () => {
       }),
     ).toThrowError('TextAlignPlugin nodes entries must be unique.');
     expect(() =>
-      createRteEditor({
+      createQalmaEditor({
         plugins: [
-          createRtePlugin({
+          createQalmaPlugin({
             key: 'badNodeExtension',
             extendNodes: () => ({ missing: { content: 'inline*' } }),
           }),
         ],
       }),
     ).toThrowError(
-      'RTE plugin "badNodeExtension" extends unknown node "missing".',
+      'QALMA plugin "badNodeExtension" extends unknown node "missing".',
     );
   });
 
@@ -1021,7 +1021,7 @@ describe('App', () => {
 
     expect(PLACEHOLDER_PLUGIN_DEFAULT_OPTIONS).toEqual({
       placeholder: 'Write something...',
-      className: 'rte-placeholder',
+      className: 'qalma-placeholder',
     });
     expect(PlaceholderPlugin.options).toEqual(
       PLACEHOLDER_PLUGIN_DEFAULT_OPTIONS,
@@ -1122,7 +1122,7 @@ describe('App', () => {
   });
 
   it('should expose mention queries and insertion through the public plugin', () => {
-    const editor = createRteEditor({
+    const editor = createQalmaEditor({
       content: '<p>Hello @gr</p>',
       plugins: [MentionPlugin],
     });
@@ -1145,7 +1145,7 @@ describe('App', () => {
       }),
     ).toBeTrue();
     expect(editor.html()).toBe(
-      '<p>Hello <span data-rte-mention="" data-mention-id="grace-hopper" data-mention-label="Grace Hopper" data-mention-trigger="@" contenteditable="false">@Grace Hopper</span> </p>',
+      '<p>Hello <span data-qalma-mention="" data-mention-id="grace-hopper" data-mention-label="Grace Hopper" data-mention-trigger="@" contenteditable="false">@Grace Hopper</span> </p>',
     );
     expect(getEditorSelectionFrom(editor)).toBe(8);
 
@@ -1153,7 +1153,7 @@ describe('App', () => {
   });
 
   it('should keep mentions disabled inside code blocks', () => {
-    const editor = createRteEditor({
+    const editor = createQalmaEditor({
       content: '<pre><code>@gr</code></pre>',
       plugins: [CodeBlockPlugin, MentionPlugin],
     });
@@ -1189,9 +1189,9 @@ describe('App', () => {
       maxQueryLength: 24,
       appendSpaceOnInsert: false,
     });
-    const editor = createRteEditor({
+    const editor = createQalmaEditor({
       content:
-        '<p>Ask <span data-rte-mention data-mention-id="ada-lovelace" data-mention-label="Ada Lovelace" data-mention-trigger="@">@Ada Lovelace</span>.</p>',
+        '<p>Ask <span data-qalma-mention data-mention-id="ada-lovelace" data-mention-label="Ada Lovelace" data-mention-trigger="@">@Ada Lovelace</span>.</p>',
       plugins: [MentionPlugin],
     });
 
@@ -1209,7 +1209,7 @@ describe('App', () => {
       appendSpaceOnInsert: false,
     });
     expect(editor.html()).toBe(
-      '<p>Ask <span data-rte-mention="" data-mention-id="ada-lovelace" data-mention-label="Ada Lovelace" data-mention-trigger="@" contenteditable="false">@Ada Lovelace</span>.</p>',
+      '<p>Ask <span data-qalma-mention="" data-mention-id="ada-lovelace" data-mention-label="Ada Lovelace" data-mention-trigger="@" contenteditable="false">@Ada Lovelace</span>.</p>',
     );
     expect(() =>
       MentionPlugin.configure({
@@ -1229,7 +1229,7 @@ describe('App', () => {
   });
 
   it('should autolink plain text URLs on paste through the public plugin', () => {
-    const editor = createRteEditor({
+    const editor = createQalmaEditor({
       content: '<p></p>',
       plugins: [LinkPlugin, PasteRulesPlugin],
     });
@@ -1248,7 +1248,7 @@ describe('App', () => {
   });
 
   it('should clean pasted HTML links through the public plugin', () => {
-    const editor = createRteEditor({
+    const editor = createQalmaEditor({
       content: '<p></p>',
       plugins: [LinkPlugin, ColorPlugin, PasteRulesPlugin],
     });
@@ -1268,7 +1268,7 @@ describe('App', () => {
   });
 
   it('should use clipboard URL metadata when pasted HTML omits the anchor', () => {
-    const editor = createRteEditor({
+    const editor = createQalmaEditor({
       content: '<p></p>',
       plugins: [LinkPlugin, ColorPlugin, PasteRulesPlugin],
     });
@@ -1329,7 +1329,7 @@ describe('App', () => {
 });
 
 function selectEditorRange(
-  editor: RteEditorController,
+  editor: QalmaEditorController,
   from: number,
   to: number,
 ): void {
@@ -1345,7 +1345,7 @@ function selectEditorRange(
   );
 }
 
-function getEditorSelectionFrom(editor: RteEditorController): number {
+function getEditorSelectionFrom(editor: QalmaEditorController): number {
   const view = (editor as unknown as { editorView: EditorView | undefined })
     .editorView;
 
@@ -1356,7 +1356,7 @@ function getEditorSelectionFrom(editor: RteEditorController): number {
   return view.state.selection.from;
 }
 
-function pastePlainText(editor: RteEditorController, text: string): void {
+function pastePlainText(editor: QalmaEditorController, text: string): void {
   pasteClipboard(editor, { text });
 }
 
@@ -1367,7 +1367,7 @@ interface TestClipboardData {
 }
 
 function pasteClipboard(
-  editor: RteEditorController,
+  editor: QalmaEditorController,
   clipboardData: TestClipboardData,
 ): void {
   const view = (editor as unknown as { editorView: EditorView | undefined })

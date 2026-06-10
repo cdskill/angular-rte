@@ -4,49 +4,49 @@ import { EditorState, Transaction } from 'prosemirror-state';
 import { EditorView } from 'prosemirror-view';
 
 import {
-  RteCommandHandler,
-  RteCommandValue,
-  RtePlugin,
-  RteQuery,
-  RteStateQuery,
-} from '../plugins/rte-plugin';
+  QalmaCommandHandler,
+  QalmaCommandValue,
+  QalmaPlugin,
+  QalmaQuery,
+  QalmaStateQuery,
+} from '../plugins/qalma-plugin';
 import { serializeHtmlDocument } from '../prosemirror/html';
 import {
   createCommandRegistry,
   createCommandStateRegistry,
   createQueryRegistry,
 } from '../prosemirror/plugins';
-import { createRteSchema } from '../prosemirror/schema';
-import { createRteState } from '../prosemirror/state';
+import { createQalmaSchema } from '../prosemirror/schema';
+import { createQalmaState } from '../prosemirror/state';
 
-export interface RteEditorOptions {
+export interface QalmaEditorOptions {
   content?: string;
   editable?: boolean;
   placeholder?: string;
-  plugins?: readonly RtePlugin[];
+  plugins?: readonly QalmaPlugin[];
 }
 
-export class RteEditorController {
+export class QalmaEditorController {
   readonly html: Signal<string>;
   readonly editable: Signal<boolean>;
   readonly placeholder: Signal<string>;
 
-  private readonly plugins: readonly RtePlugin[];
+  private readonly plugins: readonly QalmaPlugin[];
   private readonly schema: Schema;
   private readonly htmlState: WritableSignal<string>;
   private readonly editableState: WritableSignal<boolean>;
   private readonly placeholderState: WritableSignal<string>;
   private readonly viewVersion = signal(0);
-  private readonly commands: Record<string, RteCommandHandler>;
-  private readonly commandStates: Record<string, RteStateQuery>;
-  private readonly queries: Partial<Record<string, RteQuery>>;
+  private readonly commands: Record<string, QalmaCommandHandler>;
+  private readonly commandStates: Record<string, QalmaStateQuery>;
+  private readonly queries: Partial<Record<string, QalmaQuery>>;
   private editorState?: EditorState;
   private editorView?: EditorView;
   private host?: HTMLElement;
 
-  constructor(options: RteEditorOptions = {}) {
+  constructor(options: QalmaEditorOptions = {}) {
     this.plugins = [...(options.plugins ?? [])];
-    this.schema = createRteSchema(this.plugins);
+    this.schema = createQalmaSchema(this.plugins);
     this.commands = createCommandRegistry(this.schema, this.plugins);
     this.commandStates = createCommandStateRegistry(this.schema, this.plugins);
     this.queries = createQueryRegistry(this.schema, this.plugins);
@@ -68,7 +68,7 @@ export class RteEditorController {
     this.unmount();
     host.replaceChildren();
 
-    this.editorState = createRteState({
+    this.editorState = createQalmaState({
       html: this.html(),
       plugins: this.plugins,
       schema: this.schema,
@@ -97,7 +97,7 @@ export class RteEditorController {
     this.bumpViewVersion();
   }
 
-  execute(commandName: string, value?: RteCommandValue): boolean {
+  execute(commandName: string, value?: QalmaCommandValue): boolean {
     const command = this.commands[commandName];
 
     if (!this.editable() || !command || !this.editorState) {
@@ -118,7 +118,7 @@ export class RteEditorController {
     return executed;
   }
 
-  canExecute(commandName: string, value?: RteCommandValue): boolean {
+  canExecute(commandName: string, value?: QalmaCommandValue): boolean {
     this.viewVersion();
 
     const command = this.commands[commandName];
@@ -168,7 +168,7 @@ export class RteEditorController {
       return;
     }
 
-    this.editorState = createRteState({
+    this.editorState = createQalmaState({
       html,
       plugins: this.plugins,
       schema: this.schema,
@@ -236,8 +236,8 @@ export class RteEditorController {
   }
 }
 
-export function createRteEditor(
-  options: RteEditorOptions = {},
-): RteEditorController {
-  return new RteEditorController(options);
+export function createQalmaEditor(
+  options: QalmaEditorOptions = {},
+): QalmaEditorController {
+  return new QalmaEditorController(options);
 }

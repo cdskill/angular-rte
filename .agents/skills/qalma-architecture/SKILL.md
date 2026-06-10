@@ -1,9 +1,9 @@
 ---
-name: angular-rte-architecture
-description: Guide architecture and product decisions for the Angular RTE repository. Use when discussing or changing the editor vision, public API, headless composition model, ProseMirror boundary, repository or library structure, plugin boundaries, scalability, roadmap, or a substantial refactor.
+name: qalma-architecture
+description: Guide architecture and product decisions for the Qalma repository. Use when discussing or changing the editor vision, public API, headless composition model, ProseMirror boundary, repository or library structure, plugin boundaries, scalability, roadmap, or a substantial refactor.
 ---
 
-# Angular RTE Architecture
+# Qalma Architecture
 
 Protect the product direction while evolving the repository from its current
 small foundation. Base decisions on the code that exists today and introduce
@@ -40,13 +40,13 @@ boundaries only when they solve a demonstrated problem.
 - Angular-native and signal-first developer experience.
 - Headless core with consumer-owned templates and styling.
 - Typed, composable, independently selectable plugins.
-- Stable Angular RTE contracts over raw ProseMirror contracts.
+- Stable Qalma contracts over raw ProseMirror contracts.
 - Accessible behavior and observable command state.
 - Small intentional public API and low mandatory bundle cost.
 - Sandbox as executable consumer documentation.
 
 ## Coordinate With Plugin Work
 
-Use `angular-rte-plugin-development` when an architectural decision becomes a
+Use `qalma-plugin-development` when an architectural decision becomes a
 plugin implementation. Return here if that plugin requires a new extension
 point, public contract, or library boundary.

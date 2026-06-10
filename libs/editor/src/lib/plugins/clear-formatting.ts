@@ -1,22 +1,22 @@
 import { Node as ProseMirrorNode, NodeType } from 'prosemirror-model';
 import { EditorState } from 'prosemirror-state';
 
-import { createRtePlugin, RteCommandHandler, RtePlugin } from './rte-plugin';
+import { createQalmaPlugin, QalmaCommandHandler, QalmaPlugin } from './qalma-plugin';
 
-export const ClearFormattingPlugin = createRtePlugin({
+export const ClearFormattingPlugin = createQalmaPlugin({
   key: 'clearFormatting',
   commands: (schema) => ({
     clearFormatting: createClearFormattingCommand(schema.nodes['paragraph']),
   }),
 });
 
-export const ClearFormattingKit: readonly RtePlugin[] = [
+export const ClearFormattingKit: readonly QalmaPlugin[] = [
   ClearFormattingPlugin,
 ];
 
 function createClearFormattingCommand(
   paragraph: NodeType,
-): RteCommandHandler {
+): QalmaCommandHandler {
   return (state, dispatch) => {
     const markRanges = getMarkRangesToClear(state);
     const hasMarksToClear =

@@ -7,10 +7,10 @@ import {
 import { EditorView } from 'prosemirror-view';
 
 import {
-  createConfigurableRtePlugin,
-  createRtePlugin,
-  RteCommandHandler,
-} from './rte-plugin';
+  createConfigurableQalmaPlugin,
+  createQalmaPlugin,
+  QalmaCommandHandler,
+} from './qalma-plugin';
 import { isMarkActive } from '../prosemirror/queries';
 
 export interface LinkCommandValue {
@@ -53,7 +53,7 @@ export const LINK_PLUGIN_DEFAULT_OPTIONS: Readonly<LinkPluginOptions> =
     defaultRel: 'noopener noreferrer',
   });
 
-export const LinkPlugin = createConfigurableRtePlugin(
+export const LinkPlugin = createConfigurableQalmaPlugin(
   LINK_PLUGIN_DEFAULT_OPTIONS,
   (options) => {
     assertLinkPluginOptions(options);
@@ -108,7 +108,7 @@ export const LinkPlugin = createConfigurableRtePlugin(
       },
     };
 
-    return createRtePlugin({
+    return createQalmaPlugin({
       key: 'link',
       marks: {
         link: linkMark,
@@ -132,7 +132,7 @@ export const LinkPlugin = createConfigurableRtePlugin(
 function createSetLinkCommand(
   mark: MarkType,
   options: Readonly<LinkPluginOptions>,
-): RteCommandHandler {
+): QalmaCommandHandler {
   return (state, dispatch, _view, value) => {
     const attrs = resolveLinkAttrs(value, options);
 
@@ -159,7 +159,7 @@ function createSetLinkCommand(
   };
 }
 
-function createUnsetLinkCommand(mark: MarkType): RteCommandHandler {
+function createUnsetLinkCommand(mark: MarkType): QalmaCommandHandler {
   return (state, dispatch) => {
     if (!isMarkActive(state, mark)) {
       return false;
@@ -179,7 +179,7 @@ function createUnsetLinkCommand(mark: MarkType): RteCommandHandler {
   };
 }
 
-function createSelectLinkCommand(mark: MarkType): RteCommandHandler {
+function createSelectLinkCommand(mark: MarkType): QalmaCommandHandler {
   return (state, dispatch, view, value) => {
     const range = resolveLinkSelectionRange(state, mark, view, value);
 

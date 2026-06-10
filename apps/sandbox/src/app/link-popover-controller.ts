@@ -1,5 +1,5 @@
 import { signal } from '@angular/core';
-import { LinkState, RteEditorController } from '@angular-rte/editor';
+import { LinkState, QalmaEditorController } from '@qalma/editor';
 
 import {
   createLinkPopoverPlacement,
@@ -13,7 +13,7 @@ export class LinkPopoverController {
 
   private hideTimeout: ReturnType<typeof setTimeout> | undefined;
 
-  constructor(private readonly editor: RteEditorController) {}
+  constructor(private readonly editor: QalmaEditorController) {}
 
   showToolbarEditor(event: MouseEvent): void {
     const linkState = this.editor.query<LinkState>('link');

@@ -4,7 +4,7 @@ import {
 } from 'prosemirror-model';
 import { Plugin as ProseMirrorPlugin } from 'prosemirror-state';
 
-import { createConfigurableRtePlugin, createRtePlugin } from './rte-plugin';
+import { createConfigurableQalmaPlugin, createQalmaPlugin } from './qalma-plugin';
 
 export interface PasteRulesPluginOptions {
   autolink: boolean;
@@ -23,12 +23,12 @@ export const PASTE_RULES_PLUGIN_DEFAULT_OPTIONS: Readonly<PasteRulesPluginOption
     defaultProtocol: 'https',
   });
 
-export const PasteRulesPlugin = createConfigurableRtePlugin(
+export const PasteRulesPlugin = createConfigurableQalmaPlugin(
   PASTE_RULES_PLUGIN_DEFAULT_OPTIONS,
   (options) => {
     assertPasteRulesPluginOptions(options);
 
-    return createRtePlugin({
+    return createQalmaPlugin({
       key: 'pasteRules',
       prosemirrorPlugins: (schema) => [
         createPasteRulesPlugin(schema, options),

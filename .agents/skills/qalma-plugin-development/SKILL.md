@@ -1,20 +1,20 @@
 ---
-name: angular-rte-plugin-development
-description: Implement, change, review, or remove Angular RTE editor plugins end to end. Use for requests involving a new plugin or feature, ProseMirror marks or nodes, commands, command states, keyboard shortcuts, configurable plugin options, plugin kits, toolbar integration, sandbox examples, or plugin behavior tests.
+name: qalma-plugin-development
+description: Implement, change, review, or remove Qalma editor plugins end to end. Use for requests involving a new plugin or feature, ProseMirror marks or nodes, commands, command states, keyboard shortcuts, configurable plugin options, plugin kits, toolbar integration, sandbox examples, or plugin behavior tests.
 ---
 
-# Angular RTE Plugin Development
+# Qalma Plugin Development
 
 Build each plugin as a complete consumer-visible vertical slice while preserving
-the headless Angular RTE architecture.
+the headless Qalma architecture.
 
 ## Prepare
 
 1. Read [plugin-contract.md](references/plugin-contract.md).
 2. Read [definition-of-done.md](references/definition-of-done.md).
-3. Inspect `rte-plugin.ts`, the closest existing plugin, the ProseMirror
+3. Inspect `qalma-plugin.ts`, the closest existing plugin, the ProseMirror
    registries, the public barrel, sandbox composition, and relevant tests.
-4. Use `angular-rte-architecture` first if the feature needs a new core
+4. Use `qalma-architecture` first if the feature needs a new core
    extension point, public escape hatch, or library boundary.
 
 ## Implement A Plugin
@@ -22,7 +22,7 @@ the headless Angular RTE architecture.
 1. Define the capability and separate engine behavior from consumer
    presentation.
 2. Prefer a proven ProseMirror package or primitive for editing semantics.
-3. Design Angular RTE-owned names and public options. Keep the raw engine
+3. Design Qalma-owned names and public options. Keep the raw engine
    contract private by default.
 4. Add the plugin under `libs/editor/src/lib/plugins` unless architecture
    criteria justify another location.
@@ -37,9 +37,9 @@ the headless Angular RTE architecture.
 
 ## Configurable Plugin Rules
 
-- Define an Angular RTE-owned `...PluginOptions` interface.
+- Define a Qalma-owned `...PluginOptions` interface.
 - Export immutable default options when consumers benefit from knowing them.
-- Use `createConfigurableRtePlugin`.
+- Use `createConfigurableQalmaPlugin`.
 - Merge partial options with defaults.
 - Validate resolved options early with actionable errors.
 - Do not mutate the base plugin or previously configured instances.
@@ -51,7 +51,7 @@ the headless Angular RTE architecture.
 - Give plugin keys, schema names, command names, and shortcuts stable unique
   names.
 - Add `commandStates` when UI needs meaningful active state.
-- Rely on `rteCommand` for execution, disabled state, focus preservation, active
+- Rely on `qalmaCommand` for execution, disabled state, focus preservation, active
   class, and `aria-pressed`.
 - Keep toolbar labels, icons, order, styling, and layout in the consumer.
 - A kit is a readonly convenience collection of plugins, not a different plugin

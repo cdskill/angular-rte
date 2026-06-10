@@ -1,7 +1,7 @@
 export * from './lib/editor/command';
 export * from './lib/editor/content';
 export * from './lib/editor/editor';
-export * from './lib/editor/rte-editor-controller';
+export * from './lib/editor/qalma-editor-controller';
 export * from './lib/editor/toolbar';
 export * from './lib/plugins/blockquote';
 export * from './lib/plugins/clear-formatting';
@@ -17,7 +17,7 @@ export * from './lib/plugins/lists';
 export * from './lib/plugins/mention';
 export * from './lib/plugins/paste-rules';
 export * from './lib/plugins/placeholder';
-export * from './lib/plugins/rte-plugin';
+export * from './lib/plugins/qalma-plugin';
 export * from './lib/plugins/subscript-superscript';
 export * from './lib/plugins/text-align';
 export * from './lib/plugins/text-formatting';

@@ -12,35 +12,35 @@
 
 ## Runtime Flow
 
-1. A consumer calls `createRteEditor()` with content, editor options, and a
+1. A consumer calls `createQalmaEditor()` with content, editor options, and a
    plugin array.
-2. `RteEditorController` combines plugin contributions into one schema, command
+2. `QalmaEditorController` combines plugin contributions into one schema, command
    registry, command-state registry, query registry, and ProseMirror editor
    state.
-3. `<rte-editor [editor]="editor">` provides the controller to projected
+3. `<qalma-editor [editor]="editor">` provides the controller to projected
    descendants.
-4. `<rte-content />` mounts and destroys the ProseMirror `EditorView`.
-5. Consumer-owned buttons use `rteCommand` to execute named commands and receive
+4. `<qalma-content />` mounts and destroys the ProseMirror `EditorView`.
+5. Consumer-owned buttons use `qalmaCommand` to execute named commands and receive
    disabled, active-class, and `aria-pressed` state.
-6. `<rte-toolbar>` is an accessible projection primitive; it does not choose or
+6. `<qalma-toolbar>` is an accessible projection primitive; it does not choose or
    render commands.
 
 ## Current Public Surface
 
 The public barrel intentionally exposes:
 
-- Editor primitives and `createRteEditor`.
-- The `RtePlugin` and configurable-plugin contracts.
+- Editor primitives and `createQalmaEditor`.
+- The `QalmaPlugin` and configurable-plugin contracts.
 - First-party text-formatting plugins and `TextFormattingKit`.
-- The configurable `LinkPlugin` and its Angular RTE-owned state/options.
-- The configurable `HistoryPlugin` and its Angular RTE-owned options/defaults.
+- The configurable `LinkPlugin` and its Qalma-owned state/options.
+- The configurable `HistoryPlugin` and its Qalma-owned options/defaults.
 
 Keep helpers under `lib/prosemirror` private unless a consumer use case requires
 an explicit escape hatch.
 
 ## Plugin Contract
 
-An `RtePlugin` has a unique `key` and can contribute:
+A `QalmaPlugin` has a unique `key` and can contribute:
 
 - `nodes`
 - `extendNodes(nodes)`
@@ -101,7 +101,7 @@ Create these only when the current implementation demonstrates the boundary.
   needs Angular behavior.
 - Keep optional features and heavy dependencies out of the mandatory path.
 - Keep `libs/editor` side-effect free so host bundlers can tree-shake unused
-  first-party plugins from `@angular-rte/editor` barrel imports. Plugin modules
+  first-party plugins from `@qalma/editor` barrel imports. Plugin modules
   must not register global behavior, patch prototypes, mutate shared runtime
   state, import global CSS, or perform browser work at module evaluation time.
 
@@ -111,6 +111,6 @@ Before adding an abstraction or public export, answer:
 
 1. Which current consumer problem does it solve?
 2. Does it preserve consumer-owned UI and plugin selection?
-3. Is it an Angular RTE concept or an engine implementation detail?
+3. Is it a Qalma concept or an engine implementation detail?
 4. Can it remain private until a second use case exists?
 5. What concrete signal would justify extracting it later?

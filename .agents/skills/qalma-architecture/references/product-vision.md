@@ -2,12 +2,12 @@
 
 ## North Star
 
-Angular RTE should become the modern rich text editor toolkit Angular developers
+Qalma should become the modern rich text editor toolkit Angular developers
 reach for when they want the power and extensibility associated with Plate or
 Tiptap without adopting a React-oriented abstraction.
 
 It is not merely an Angular wrapper around ProseMirror. ProseMirror is the
-editing engine; Angular RTE is the coherent Angular-native authoring,
+editing engine; Qalma is the coherent Angular-native authoring,
 composition, state, and extension experience built above it.
 
 ## Positioning
@@ -35,7 +35,7 @@ the plugin array.
 
 ### Angular Contracts Over Engine Leakage
 
-Use ProseMirror internally, but expose Angular RTE-owned plugin contracts,
+Use ProseMirror internally, but expose Qalma-owned plugin contracts,
 options, commands, state queries, and components. Raw ProseMirror access may be
 added later as an intentional advanced escape hatch, not as the default API.
 

@@ -13,7 +13,7 @@ import {
   wrapInList,
 } from 'prosemirror-schema-list';
 
-import { createRtePlugin, RteCommandHandler, RtePlugin } from './rte-plugin';
+import { createQalmaPlugin, QalmaCommandHandler, QalmaPlugin } from './qalma-plugin';
 
 const bulletListNode: NodeSpec = {
   ...prosemirrorBulletList,
@@ -32,7 +32,7 @@ const listItemNode: NodeSpec = {
   content: 'paragraph block*',
 };
 
-export const ListsPlugin = createRtePlugin({
+export const ListsPlugin = createQalmaPlugin({
   key: 'lists',
   nodes: {
     bulletList: bulletListNode,
@@ -90,13 +90,13 @@ export const ListsPlugin = createRtePlugin({
   prosemirrorPlugins: () => [createLeaveEditorPlugin()],
 });
 
-export const ListsKit: readonly RtePlugin[] = [ListsPlugin];
+export const ListsKit: readonly QalmaPlugin[] = [ListsPlugin];
 
 function createToggleListCommand(
   list: NodeType,
   alternateList: NodeType,
   listItem: NodeType,
-): RteCommandHandler {
+): QalmaCommandHandler {
   return (state, dispatch) => {
     if (isListActive(state, list)) {
       return liftProsemirrorListItem(listItem)(state, dispatch);
@@ -126,8 +126,8 @@ function createToggleListCommand(
 
 function createListTabCommand(
   lists: readonly NodeType[],
-  command: RteCommandHandler,
-): RteCommandHandler {
+  command: QalmaCommandHandler,
+): QalmaCommandHandler {
   return (state, dispatch, view) => {
     if (command(state, dispatch, view)) {
       return true;

@@ -1,4 +1,0 @@
-interface:
-  display_name: 'Angular RTE Architecture'
-  short_description: 'Guide architecture and product decisions for Angular RTE'
-  default_prompt: 'Apply the Angular RTE architecture and product vision to this repository decision.'

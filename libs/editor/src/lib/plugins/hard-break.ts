@@ -1,7 +1,7 @@
 import { NodeSpec, NodeType } from 'prosemirror-model';
 import { EditorState } from 'prosemirror-state';
 
-import { createRtePlugin, RteCommandHandler, RtePlugin } from './rte-plugin';
+import { createQalmaPlugin, QalmaCommandHandler, QalmaPlugin } from './qalma-plugin';
 
 const hardBreakNode: NodeSpec = {
   inline: true,
@@ -13,7 +13,7 @@ const hardBreakNode: NodeSpec = {
   leafText: () => '\n',
 };
 
-export const HardBreakPlugin = createRtePlugin({
+export const HardBreakPlugin = createQalmaPlugin({
   key: 'hardBreak',
   nodes: {
     hardBreak: hardBreakNode,
@@ -26,11 +26,11 @@ export const HardBreakPlugin = createRtePlugin({
   }),
 });
 
-export const HardBreakKit: readonly RtePlugin[] = [HardBreakPlugin];
+export const HardBreakKit: readonly QalmaPlugin[] = [HardBreakPlugin];
 
 function createInsertHardBreakCommand(
   hardBreak: NodeType,
-): RteCommandHandler {
+): QalmaCommandHandler {
   return (state, dispatch) => {
     if (!canInsertHardBreak(state, hardBreak)) {
       return false;

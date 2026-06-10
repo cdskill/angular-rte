@@ -6,11 +6,11 @@ import {
 } from 'prosemirror-state';
 
 import {
-  createConfigurableRtePlugin,
-  createRtePlugin,
-  RteCommandHandler,
-  RtePlugin,
-} from './rte-plugin';
+  createConfigurableQalmaPlugin,
+  createQalmaPlugin,
+  QalmaCommandHandler,
+  QalmaPlugin,
+} from './qalma-plugin';
 
 export interface ImageCommandValue {
   src: string;
@@ -43,7 +43,7 @@ export const IMAGE_PLUGIN_DEFAULT_OPTIONS: Readonly<ImagePluginOptions> =
     defaultAlt: '',
   });
 
-export const ImagePlugin = createConfigurableRtePlugin(
+export const ImagePlugin = createConfigurableQalmaPlugin(
   IMAGE_PLUGIN_DEFAULT_OPTIONS,
   (options) => {
     assertImagePluginOptions(options);
@@ -97,7 +97,7 @@ export const ImagePlugin = createConfigurableRtePlugin(
       },
     };
 
-    return createRtePlugin({
+    return createQalmaPlugin({
       key: 'image',
       nodes: {
         image: imageNode,
@@ -119,12 +119,12 @@ export const ImagePlugin = createConfigurableRtePlugin(
   },
 );
 
-export const ImageKit: readonly RtePlugin[] = [ImagePlugin];
+export const ImageKit: readonly QalmaPlugin[] = [ImagePlugin];
 
 function createInsertImageCommand(
   image: NodeType,
   options: Readonly<ImagePluginOptions>,
-): RteCommandHandler {
+): QalmaCommandHandler {
   return (state, dispatch, _view, value) => {
     const attrs = resolveImageAttrs(value, options);
 
@@ -153,7 +153,7 @@ function createInsertImageCommand(
 function createUpdateImageCommand(
   image: NodeType,
   options: Readonly<ImagePluginOptions>,
-): RteCommandHandler {
+): QalmaCommandHandler {
   return (state, dispatch, _view, value) => {
     const selectedImage = getSelectedImage(state, image);
     const attrs = resolveImageAttrs(
@@ -180,7 +180,7 @@ function createUpdateImageCommand(
   };
 }
 
-function createRemoveImageCommand(image: NodeType): RteCommandHandler {
+function createRemoveImageCommand(image: NodeType): QalmaCommandHandler {
   return (state, dispatch) => {
     const selectedImage = getSelectedImage(state, image);
 

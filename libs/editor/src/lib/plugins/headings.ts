@@ -3,11 +3,11 @@ import { NodeSpec, NodeType } from 'prosemirror-model';
 import { EditorState } from 'prosemirror-state';
 
 import {
-  createConfigurableRtePlugin,
-  createRtePlugin,
-  RteCommandHandler,
-  RtePlugin,
-} from './rte-plugin';
+  createConfigurableQalmaPlugin,
+  createQalmaPlugin,
+  QalmaCommandHandler,
+  QalmaPlugin,
+} from './qalma-plugin';
 
 export type HeadingLevel = 1 | 2 | 3 | 4 | 5 | 6;
 
@@ -24,7 +24,7 @@ export const HEADINGS_PLUGIN_DEFAULT_OPTIONS: Readonly<HeadingsPluginOptions> =
     levels: Object.freeze([1, 2, 3] satisfies HeadingLevel[]),
   });
 
-export const HeadingsPlugin = createConfigurableRtePlugin(
+export const HeadingsPlugin = createConfigurableQalmaPlugin(
   HEADINGS_PLUGIN_DEFAULT_OPTIONS,
   (options) => {
     assertHeadingsPluginOptions(options);
@@ -43,7 +43,7 @@ export const HeadingsPlugin = createConfigurableRtePlugin(
       toDOM: (node) => [`h${node.attrs['level']}`, 0],
     };
 
-    return createRtePlugin({
+    return createQalmaPlugin({
       key: 'headings',
       nodes: {
         heading: headingNode,
@@ -65,9 +65,9 @@ export const HeadingsPlugin = createConfigurableRtePlugin(
   },
 );
 
-export const HeadingsKit: readonly RtePlugin[] = [HeadingsPlugin];
+export const HeadingsKit: readonly QalmaPlugin[] = [HeadingsPlugin];
 
-function createSetParagraphCommand(paragraph: NodeType): RteCommandHandler {
+function createSetParagraphCommand(paragraph: NodeType): QalmaCommandHandler {
   return (state, dispatch) => {
     if (isParagraphActive(state)) {
       return true;
@@ -81,7 +81,7 @@ function createHeadingCommands(
   heading: NodeType,
   paragraph: NodeType,
   levels: readonly HeadingLevel[],
-): Record<string, RteCommandHandler> {
+): Record<string, QalmaCommandHandler> {
   return Object.fromEntries(
     levels.map((level) => [
       getHeadingCommandName(level),
@@ -94,7 +94,7 @@ function createToggleHeadingCommand(
   heading: NodeType,
   paragraph: NodeType,
   level: HeadingLevel,
-): RteCommandHandler {
+): QalmaCommandHandler {
   return (state, dispatch) => {
     if (isHeadingActive(state, heading, level)) {
       return setBlockType(paragraph)(state, dispatch);
@@ -117,7 +117,7 @@ function createHeadingCommandStates(
 }
 
 function createHeadingShortcuts(
-  schema: Parameters<NonNullable<RtePlugin['shortcuts']>>[0],
+  schema: Parameters<NonNullable<QalmaPlugin['shortcuts']>>[0],
   levels: readonly HeadingLevel[],
 ) {
   return Object.fromEntries(

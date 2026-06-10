@@ -1,6 +1,6 @@
 import { history, redo, undo } from 'prosemirror-history';
 
-import { createConfigurableRtePlugin, createRtePlugin } from './rte-plugin';
+import { createConfigurableQalmaPlugin, createQalmaPlugin } from './qalma-plugin';
 
 export interface HistoryPluginOptions {
   depth: number;
@@ -13,12 +13,12 @@ export const HISTORY_PLUGIN_DEFAULT_OPTIONS: Readonly<HistoryPluginOptions> =
     newGroupDelay: 500,
   });
 
-export const HistoryPlugin = createConfigurableRtePlugin(
+export const HistoryPlugin = createConfigurableQalmaPlugin(
   HISTORY_PLUGIN_DEFAULT_OPTIONS,
   (options) => {
     assertHistoryPluginOptions(options);
 
-    return createRtePlugin({
+    return createQalmaPlugin({
       key: 'history',
       prosemirrorPlugins: () => [history(options)],
       commands: () => ({

@@ -2,7 +2,7 @@ import { lift, wrapIn } from 'prosemirror-commands';
 import { NodeSpec, NodeType } from 'prosemirror-model';
 import { EditorState } from 'prosemirror-state';
 
-import { createRtePlugin, RteCommandHandler, RtePlugin } from './rte-plugin';
+import { createQalmaPlugin, QalmaCommandHandler, QalmaPlugin } from './qalma-plugin';
 
 const blockquoteNode: NodeSpec = {
   content: 'block+',
@@ -12,7 +12,7 @@ const blockquoteNode: NodeSpec = {
   toDOM: () => ['blockquote', 0],
 };
 
-export const BlockquotePlugin = createRtePlugin({
+export const BlockquotePlugin = createQalmaPlugin({
   key: 'blockquote',
   nodes: {
     blockquote: blockquoteNode,
@@ -28,11 +28,11 @@ export const BlockquotePlugin = createRtePlugin({
   }),
 });
 
-export const BlockquoteKit: readonly RtePlugin[] = [BlockquotePlugin];
+export const BlockquoteKit: readonly QalmaPlugin[] = [BlockquotePlugin];
 
 function createToggleBlockquoteCommand(
   blockquote: NodeType,
-): RteCommandHandler {
+): QalmaCommandHandler {
   return (state, dispatch) => {
     if (isBlockquoteActive(state, blockquote)) {
       return lift(state, dispatch);

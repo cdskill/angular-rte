@@ -93,7 +93,7 @@ test('inserts mentions from the consumer-owned overlay', async ({ page }) => {
   await page.keyboard.press('ArrowDown');
   await page.keyboard.press('Space');
   await expect(page.locator('pre')).toContainText(
-    '<p><span data-rte-mention="" data-mention-id="grace-hopper" data-mention-label="Grace Hopper" data-mention-trigger="@" contenteditable="false">@Grace Hopper</span> </p>',
+    '<p><span data-qalma-mention="" data-mention-id="grace-hopper" data-mention-label="Grace Hopper" data-mention-trigger="@" contenteditable="false">@Grace Hopper</span> </p>',
   );
 });
 
@@ -151,7 +151,7 @@ test('renders the configured plugin toolbar', async ({ page }) => {
   const undo = toolbar.getByRole('button', { name: 'Undo' });
   const redo = toolbar.getByRole('button', { name: 'Redo' });
 
-  await expect(page.locator('rte-editor > button')).toHaveCount(0);
+  await expect(page.locator('qalma-editor > button')).toHaveCount(0);
   await expect(toolbar.getByRole('button')).toHaveCount(43);
   await expect(paragraph).toHaveAttribute('title', 'Paragraph');
   await expect(heading1).toHaveAttribute('title', 'Heading 1');
@@ -227,18 +227,18 @@ test('renders the configured plugin toolbar', async ({ page }) => {
   await expect(undo).toBeDisabled();
   await expect(redo).toBeDisabled();
 
-  await expect(page.locator('.ProseMirror')).toContainText('Angular RTE');
+  await expect(page.locator('.ProseMirror')).toContainText('Qalma');
   await expect(page.locator('pre')).toContainText(
     '<p style="text-align: center;">Build headless editing primitives with a plugin stack that remains fully selected by the consumer.</p>',
   );
   await expect(page.locator('pre')).toContainText(
-    '<h1><strong>Angular RTE</strong></h1>',
+    '<h1><strong>Qalma</strong></h1>',
   );
   await expect(page.locator('pre')).toContainText(
     '<ul><li><p>Compose plugins in TypeScript.</p></li><li><p>Keep toolbar markup in the consuming app.</p></li></ul>',
   );
   await expect(page.locator('pre')).toContainText(
-    '<ol><li><p>Pick capabilities for the current product surface.</p></li><li><p>Render controls with Angular templates and rteCommand.</p></li></ol>',
+    '<ol><li><p>Pick capabilities for the current product surface.</p></li><li><p>Render controls with Angular templates and qalmaCommand.</p></li></ol>',
   );
   await expect(page.locator('pre')).toContainText(
     '<blockquote><p>Quote important passages without taking ownership away from the consuming app.</p></blockquote>',
@@ -338,7 +338,7 @@ test('renders the configured plugin toolbar', async ({ page }) => {
     page.getByRole('dialog', { name: 'Link preview' }).getByRole('link'),
   ).toContainText('https://angular.dev');
 
-  await page.locator('.ProseMirror').getByText('Angular RTE').selectText();
+  await page.locator('.ProseMirror').getByText('Qalma').selectText();
   await link.click();
   await page
     .getByRole('dialog', { name: 'Link preview' })
@@ -349,7 +349,7 @@ test('renders the configured plugin toolbar', async ({ page }) => {
     .getByRole('button', { name: 'Save' })
     .click();
   await expect(page.locator('pre')).toContainText(
-    '<h1><strong><a href="/docs" target="_blank" rel="noopener noreferrer">Angular RTE</a></strong></h1>',
+    '<h1><strong><a href="/docs" target="_blank" rel="noopener noreferrer">Qalma</a></strong></h1>',
   );
   await expect(unlink).toBeEnabled();
 
@@ -367,7 +367,7 @@ test('renders the configured plugin toolbar', async ({ page }) => {
     .getByRole('button', { name: 'Save' })
     .click();
   await expect(page.locator('pre')).toContainText(
-    '<h1><strong><a href="/guide" target="_blank" rel="noopener noreferrer">Angular RTE</a></strong></h1>',
+    '<h1><strong><a href="/guide" target="_blank" rel="noopener noreferrer">Qalma</a></strong></h1>',
   );
 
   const popupPromise = page.waitForEvent('popup');
@@ -382,7 +382,7 @@ test('renders the configured plugin toolbar', async ({ page }) => {
     .getByRole('button', { name: 'Unlink' })
     .click();
   await expect(page.locator('pre')).toContainText(
-    '<h1><strong>Angular RTE</strong></h1>',
+    '<h1><strong>Qalma</strong></h1>',
   );
 
   await page.locator('.ProseMirror').getByText('highlight').selectText();

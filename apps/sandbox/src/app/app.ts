@@ -11,7 +11,7 @@ import { SandboxEditor } from './sandbox-editor';
     >
       <header class="mb-3">
         <p class="mb-1.5 text-sm font-bold uppercase text-slate-600">
-          Angular RTE
+          Qalma
         </p>
         <h1 class="text-4xl font-extrabold leading-tight text-slate-950">
           ProseMirror editor foundation

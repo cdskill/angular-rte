@@ -1,22 +1,22 @@
 import { Directive, computed, inject, input } from '@angular/core';
 
-import { RTE_EDITOR_CONTEXT } from './editor-context';
+import { QALMA_EDITOR_CONTEXT } from './editor-context';
 
 @Directive({
-  selector: 'button[rteCommand]',
+  selector: 'button[qalmaCommand]',
   host: {
     '(click)': 'execute()',
     '(mousedown)': 'preserveSelection($event)',
     '[attr.aria-pressed]': 'ariaPressed()',
-    '[class.rte-command-active]': 'active()',
+    '[class.qalma-command-active]': 'active()',
     '[disabled]': 'disabled()',
   },
 })
-export class RteCommand {
-  readonly command = input.required<string>({ alias: 'rteCommand' });
-  readonly rteCommandValue = input<unknown>();
+export class QalmaCommand {
+  readonly command = input.required<string>({ alias: 'qalmaCommand' });
+  readonly qalmaCommandValue = input<unknown>();
 
-  private readonly context = inject(RTE_EDITOR_CONTEXT);
+  private readonly context = inject(QALMA_EDITOR_CONTEXT);
   private readonly editor = computed(() => this.context.editor());
 
   protected readonly active = computed(() =>
@@ -24,7 +24,7 @@ export class RteCommand {
   );
   protected readonly disabled = computed(
     () =>
-      !this.editor().canExecute(this.command(), this.rteCommandValue()),
+      !this.editor().canExecute(this.command(), this.qalmaCommandValue()),
   );
   protected readonly ariaPressed = computed(() =>
     this.editor().hasCommandState(this.command())
@@ -33,7 +33,7 @@ export class RteCommand {
   );
 
   protected execute(): void {
-    this.editor().execute(this.command(), this.rteCommandValue());
+    this.editor().execute(this.command(), this.qalmaCommandValue());
   }
 
   protected preserveSelection(event: MouseEvent): void {

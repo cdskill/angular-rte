@@ -2,14 +2,14 @@ import { Mark, MarkSpec, MarkType } from 'prosemirror-model';
 import { EditorState, Transaction } from 'prosemirror-state';
 
 import {
-  createRtePlugin,
-  RteCommandHandler,
-  RtePlugin,
-} from './rte-plugin';
+  createQalmaPlugin,
+  QalmaCommandHandler,
+  QalmaPlugin,
+} from './qalma-plugin';
 
 export type ColorCommandValue = string;
 
-export const ColorPlugin = createRtePlugin({
+export const ColorPlugin = createQalmaPlugin({
   key: 'color',
   marks: {
     textStyle: createTextStyleMark(),
@@ -38,7 +38,7 @@ export const ColorPlugin = createRtePlugin({
   }),
 });
 
-export const ColorKit: readonly RtePlugin[] = [ColorPlugin];
+export const ColorKit: readonly QalmaPlugin[] = [ColorPlugin];
 
 interface TextStyleAttrs {
   color: string | null;
@@ -93,7 +93,7 @@ function createTextStyleMark(): MarkSpec {
 function createSetTextStyleCommand(
   mark: MarkType,
   attribute: TextStyleAttributeName,
-): RteCommandHandler {
+): QalmaCommandHandler {
   return (state, dispatch, _view, value) => {
     const color = normalizeCommandColor(value, getCssPropertyName(attribute));
 
@@ -117,7 +117,7 @@ function createSetTextStyleCommand(
 function createUnsetTextStyleCommand(
   mark: MarkType,
   attribute: TextStyleAttributeName,
-): RteCommandHandler {
+): QalmaCommandHandler {
   return (state, dispatch) => {
     if (!isTextStyleAttributeActive(state, mark, attribute)) {
       return false;

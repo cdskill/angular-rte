@@ -1,4 +1,4 @@
-# Angular RTE Repository Guidance
+# Qalma Repository Guidance
 
 ## Mission
 
@@ -12,9 +12,9 @@ extension points over exposing raw ProseMirror details.
 
 ## Repository Skills
 
-- Use `angular-rte-architecture` for product vision, repository structure,
+- Use `qalma-architecture` for product vision, repository structure,
   public API design, new library boundaries, and architectural refactors.
-- Use `angular-rte-plugin-development` whenever adding, changing, reviewing, or
+- Use `qalma-plugin-development` whenever adding, changing, reviewing, or
   removing an editor plugin, command, mark, node, shortcut, or ProseMirror
   behavior.
 - Use `git-commit` when the user invokes `/commit` or asks to generate and
@@ -27,12 +27,12 @@ extension points over exposing raw ProseMirror details.
 - Let consumers select plugins in TypeScript and compose their UI explicitly
   through Angular templates and content projection.
 - Treat `apps/sandbox` as a real consumer and executable documentation. It must
-  use only the intentional public API from `@angular-rte/editor`.
+  use only the intentional public API from `@qalma/editor`.
 - Keep ProseMirror as the internal engine. Expose it publicly only after an
   explicit API design decision.
-- Let an `RtePlugin` contribute schema nodes or marks, commands, command states,
+- Let a `QalmaPlugin` contribute schema nodes or marks, commands, command states,
   shortcuts, and ProseMirror plugins.
-- Expose configurable features through Angular RTE-owned option interfaces,
+- Expose configurable features through Qalma-owned option interfaces,
   immutable defaults, and validation. Do not leak a third-party options object
   as the public contract by default.
 - Keep first-party plugins in `libs/editor/src/lib/plugins` until a real

@@ -2,8 +2,8 @@ import { computed, signal } from '@angular/core';
 import {
   MentionCommandValue,
   MentionState,
-  RteEditorController,
-} from '@angular-rte/editor';
+  QalmaEditorController,
+} from '@qalma/editor';
 
 export interface SandboxMentionOption {
   id: string;
@@ -98,7 +98,7 @@ export class SandboxMentionController {
   private requestId = 0;
 
   constructor(
-    private readonly editor: RteEditorController,
+    private readonly editor: QalmaEditorController,
     private readonly source: SandboxMentionSource,
   ) {}
 

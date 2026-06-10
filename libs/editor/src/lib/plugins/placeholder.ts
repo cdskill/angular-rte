@@ -3,10 +3,10 @@ import { Plugin as ProseMirrorPlugin } from 'prosemirror-state';
 import { Decoration, DecorationSet } from 'prosemirror-view';
 
 import {
-  createConfigurableRtePlugin,
-  createRtePlugin,
-  RtePlugin,
-} from './rte-plugin';
+  createConfigurableQalmaPlugin,
+  createQalmaPlugin,
+  QalmaPlugin,
+} from './qalma-plugin';
 
 export interface PlaceholderPluginOptions {
   placeholder: string;
@@ -16,22 +16,22 @@ export interface PlaceholderPluginOptions {
 export const PLACEHOLDER_PLUGIN_DEFAULT_OPTIONS: Readonly<PlaceholderPluginOptions> =
   Object.freeze({
     placeholder: 'Write something...',
-    className: 'rte-placeholder',
+    className: 'qalma-placeholder',
   });
 
-export const PlaceholderPlugin = createConfigurableRtePlugin(
+export const PlaceholderPlugin = createConfigurableQalmaPlugin(
   PLACEHOLDER_PLUGIN_DEFAULT_OPTIONS,
   (options) => {
     assertPlaceholderPluginOptions(options);
 
-    return createRtePlugin({
+    return createQalmaPlugin({
       key: 'placeholder',
       prosemirrorPlugins: () => [createPlaceholderProseMirrorPlugin(options)],
     });
   },
 );
 
-export const PlaceholderKit: readonly RtePlugin[] = [PlaceholderPlugin];
+export const PlaceholderKit: readonly QalmaPlugin[] = [PlaceholderPlugin];
 
 function createPlaceholderProseMirrorPlugin(
   options: Readonly<PlaceholderPluginOptions>,

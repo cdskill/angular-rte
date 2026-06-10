@@ -1,25 +1,25 @@
 @import 'tailwindcss';
 
-rte-content .ProseMirror a {
+qalma-content .ProseMirror a {
   color: #0000ee;
   text-decoration: underline;
   cursor: pointer;
 }
 
-rte-content .ProseMirror a:visited {
+qalma-content .ProseMirror a:visited {
   color: #551a8b;
 }
 
-rte-content .ProseMirror a:hover {
+qalma-content .ProseMirror a:hover {
   text-decoration-thickness: 2px;
 }
 
-rte-content .ProseMirror a:focus-visible {
+qalma-content .ProseMirror a:focus-visible {
   outline: 2px solid #1a73e8;
   outline-offset: 2px;
 }
 
-rte-content .ProseMirror [data-rte-mention] {
+qalma-content .ProseMirror [data-qalma-mention] {
   border-radius: 0.25rem;
   background: #e0f2fe;
   color: #075985;
@@ -28,7 +28,7 @@ rte-content .ProseMirror [data-rte-mention] {
   white-space: nowrap;
 }
 
-rte-content .ProseMirror img {
+qalma-content .ProseMirror img {
   display: block;
   max-width: 100%;
   max-height: 18rem;
@@ -38,12 +38,12 @@ rte-content .ProseMirror img {
   object-fit: contain;
 }
 
-rte-content .ProseMirror img.ProseMirror-selectednode {
+qalma-content .ProseMirror img.ProseMirror-selectednode {
   outline: 3px solid #38bdf8;
   outline-offset: 2px;
 }
 
-rte-content .ProseMirror .rte-placeholder::before {
+qalma-content .ProseMirror .qalma-placeholder::before {
   content: attr(data-placeholder);
   float: left;
   height: 0;
@@ -51,26 +51,26 @@ rte-content .ProseMirror .rte-placeholder::before {
   pointer-events: none;
 }
 
-rte-content .ProseMirror li[style*='text-align: center'],
-rte-content .ProseMirror li[style*='text-align: right'],
-rte-content .ProseMirror li[style*='text-align: justify'] {
+qalma-content .ProseMirror li[style*='text-align: center'],
+qalma-content .ProseMirror li[style*='text-align: right'],
+qalma-content .ProseMirror li[style*='text-align: justify'] {
   list-style-position: inside;
 }
 
-rte-content .ProseMirror li[style*='text-align: center'] > p,
-rte-content .ProseMirror li[style*='text-align: right'] > p,
-rte-content .ProseMirror li[style*='text-align: justify'] > p {
+qalma-content .ProseMirror li[style*='text-align: center'] > p,
+qalma-content .ProseMirror li[style*='text-align: right'] > p,
+qalma-content .ProseMirror li[style*='text-align: justify'] > p {
   display: inline;
 }
 
-rte-content .ProseMirror blockquote[style*='text-align: right'] {
+qalma-content .ProseMirror blockquote[style*='text-align: right'] {
   border-left-width: 0;
   border-right: 4px solid rgb(203 213 225);
   padding-left: 0;
   padding-right: 1rem;
 }
 
-rte-content .ProseMirror .sandbox-code-block {
+qalma-content .ProseMirror .sandbox-code-block {
   margin-bottom: 0.75rem;
   overflow: hidden;
   border: 1px solid rgb(55 53 47 / 0.14);
@@ -78,7 +78,7 @@ rte-content .ProseMirror .sandbox-code-block {
   background: rgba(135, 131, 120, 0.15);
 }
 
-rte-content .ProseMirror .sandbox-code-block-toolbar {
+qalma-content .ProseMirror .sandbox-code-block-toolbar {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -89,7 +89,7 @@ rte-content .ProseMirror .sandbox-code-block-toolbar {
   padding: 0.35rem 0.5rem 0.35rem 0.75rem;
 }
 
-rte-content .ProseMirror .sandbox-code-block-language {
+qalma-content .ProseMirror .sandbox-code-block-language {
   overflow: hidden;
   color: #6b6257;
   font-family:
@@ -108,7 +108,7 @@ rte-content .ProseMirror .sandbox-code-block-language {
   white-space: nowrap;
 }
 
-rte-content .ProseMirror .sandbox-code-block-copy {
+qalma-content .ProseMirror .sandbox-code-block-copy {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -136,47 +136,47 @@ rte-content .ProseMirror .sandbox-code-block-copy {
     color 150ms ease;
 }
 
-rte-content .ProseMirror .sandbox-code-block-copy-icon {
+qalma-content .ProseMirror .sandbox-code-block-copy-icon {
   display: inline-flex;
   width: 0.875rem;
   height: 0.875rem;
   flex: none;
 }
 
-rte-content .ProseMirror .sandbox-code-block-copy-icon svg {
+qalma-content .ProseMirror .sandbox-code-block-copy-icon svg {
   display: block;
   width: 100%;
   height: 100%;
 }
 
-rte-content .ProseMirror .sandbox-code-block-copy-label {
+qalma-content .ProseMirror .sandbox-code-block-copy-label {
   min-width: 0;
 }
 
-rte-content .ProseMirror .sandbox-code-block-copy:hover {
+qalma-content .ProseMirror .sandbox-code-block-copy:hover {
   border-color: rgb(55 53 47 / 0.28);
   background: rgb(255 255 255 / 0.78);
   color: #1f2937;
 }
 
-rte-content .ProseMirror .sandbox-code-block-copy:focus-visible {
+qalma-content .ProseMirror .sandbox-code-block-copy:focus-visible {
   outline: 2px solid #2563eb;
   outline-offset: 2px;
 }
 
-rte-content .ProseMirror .sandbox-code-block-copy[data-copied='true'] {
+qalma-content .ProseMirror .sandbox-code-block-copy[data-copied='true'] {
   border-color: #16a34a;
   background: #dcfce7;
   color: #166534;
 }
 
-rte-content .ProseMirror .sandbox-code-block-copy[data-copied='fallback'] {
+qalma-content .ProseMirror .sandbox-code-block-copy[data-copied='fallback'] {
   border-color: #d97706;
   background: #fef3c7;
   color: #92400e;
 }
 
-rte-content .ProseMirror .sandbox-code-block pre {
+qalma-content .ProseMirror .sandbox-code-block pre {
   margin: 0;
   border-radius: 0;
   background: transparent;
@@ -184,47 +184,47 @@ rte-content .ProseMirror .sandbox-code-block pre {
   padding: 0.85rem 1rem 1rem;
 }
 
-rte-content .ProseMirror .sandbox-code-block .hljs-attr {
+qalma-content .ProseMirror .sandbox-code-block .hljs-attr {
   color: #1d4ed8;
 }
 
-rte-content .ProseMirror .sandbox-code-block .hljs-built_in {
+qalma-content .ProseMirror .sandbox-code-block .hljs-built_in {
   color: #0f766e;
 }
 
-rte-content .ProseMirror .sandbox-code-block .hljs-comment {
+qalma-content .ProseMirror .sandbox-code-block .hljs-comment {
   color: #78716c;
 }
 
-rte-content .ProseMirror .sandbox-code-block .hljs-keyword {
+qalma-content .ProseMirror .sandbox-code-block .hljs-keyword {
   color: #7c3aed;
 }
 
-rte-content .ProseMirror .sandbox-code-block .hljs-literal,
-rte-content .ProseMirror .sandbox-code-block .hljs-number {
+qalma-content .ProseMirror .sandbox-code-block .hljs-literal,
+qalma-content .ProseMirror .sandbox-code-block .hljs-number {
   color: #c2410c;
 }
 
-rte-content .ProseMirror .sandbox-code-block .hljs-meta {
+qalma-content .ProseMirror .sandbox-code-block .hljs-meta {
   color: #57534e;
 }
 
-rte-content .ProseMirror .sandbox-code-block .hljs-params {
+qalma-content .ProseMirror .sandbox-code-block .hljs-params {
   color: #37352f;
 }
 
-rte-content .ProseMirror .sandbox-code-block .hljs-string {
+qalma-content .ProseMirror .sandbox-code-block .hljs-string {
   color: #15803d;
 }
 
-rte-content .ProseMirror .sandbox-code-block .hljs-title {
+qalma-content .ProseMirror .sandbox-code-block .hljs-title {
   color: #b45309;
 }
 
-rte-content .ProseMirror .sandbox-code-block .hljs-type {
+qalma-content .ProseMirror .sandbox-code-block .hljs-type {
   color: #0e7490;
 }
 
-rte-content .ProseMirror .sandbox-code-block .hljs-variable {
+qalma-content .ProseMirror .sandbox-code-block .hljs-variable {
   color: #0369a1;
 }

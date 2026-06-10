@@ -2,11 +2,11 @@ import { Mark, MarkSpec, MarkType } from 'prosemirror-model';
 import { EditorState, Transaction } from 'prosemirror-state';
 
 import {
-  createConfigurableRtePlugin,
-  createRtePlugin,
-  RteCommandHandler,
-  RtePlugin,
-} from './rte-plugin';
+  createConfigurableQalmaPlugin,
+  createQalmaPlugin,
+  QalmaCommandHandler,
+  QalmaPlugin,
+} from './qalma-plugin';
 
 export type HighlightCommandValue = string;
 
@@ -19,7 +19,7 @@ export const HIGHLIGHT_PLUGIN_DEFAULT_OPTIONS: Readonly<HighlightPluginOptions> 
     defaultColor: 'rgb(254, 240, 138)',
   });
 
-export const HighlightPlugin = createConfigurableRtePlugin(
+export const HighlightPlugin = createConfigurableQalmaPlugin(
   HIGHLIGHT_PLUGIN_DEFAULT_OPTIONS,
   (options) => {
     const defaultColor = normalizeCssColor(
@@ -29,7 +29,7 @@ export const HighlightPlugin = createConfigurableRtePlugin(
 
     assertDefaultHighlightColor(defaultColor);
 
-    return createRtePlugin({
+    return createQalmaPlugin({
       key: 'highlight',
       marks: {
         highlight: createHighlightMark(defaultColor),
@@ -53,7 +53,7 @@ export const HighlightPlugin = createConfigurableRtePlugin(
   },
 );
 
-export const HighlightKit: readonly RtePlugin[] = [HighlightPlugin];
+export const HighlightKit: readonly QalmaPlugin[] = [HighlightPlugin];
 
 function createHighlightMark(defaultColor: string): MarkSpec {
   return {
@@ -91,7 +91,7 @@ function createHighlightMark(defaultColor: string): MarkSpec {
 function createSetHighlightCommand(
   mark: MarkType,
   defaultColor: string,
-): RteCommandHandler {
+): QalmaCommandHandler {
   return (state, dispatch, _view, value) => {
     const color =
       value === undefined
@@ -112,7 +112,7 @@ function createSetHighlightCommand(
   };
 }
 
-function createUnsetHighlightCommand(mark: MarkType): RteCommandHandler {
+function createUnsetHighlightCommand(mark: MarkType): QalmaCommandHandler {
   return (state, dispatch) => {
     if (!isHighlightActive(state, mark)) {
       return false;
