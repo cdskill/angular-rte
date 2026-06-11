@@ -22,20 +22,17 @@ import { createQalmaState } from '../prosemirror/state';
 export interface QalmaEditorOptions {
   content?: string;
   editable?: boolean;
-  placeholder?: string;
   plugins?: readonly QalmaPlugin[];
 }
 
 export class QalmaEditorController {
   readonly html: Signal<string>;
   readonly editable: Signal<boolean>;
-  readonly placeholder: Signal<string>;
 
   private readonly plugins: readonly QalmaPlugin[];
   private readonly schema: Schema;
   private readonly htmlState: WritableSignal<string>;
   private readonly editableState: WritableSignal<boolean>;
-  private readonly placeholderState: WritableSignal<string>;
   private readonly viewVersion = signal(0);
   private readonly commands: Record<string, QalmaCommandHandler>;
   private readonly commandStates: Record<string, QalmaStateQuery>;
@@ -53,11 +50,9 @@ export class QalmaEditorController {
 
     this.htmlState = signal(options.content ?? '<p></p>');
     this.editableState = signal(options.editable ?? true);
-    this.placeholderState = signal(options.placeholder ?? 'Write something...');
 
     this.html = this.htmlState.asReadonly();
     this.editable = this.editableState.asReadonly();
-    this.placeholder = this.placeholderState.asReadonly();
   }
 
   mount(host: HTMLElement): void {
@@ -185,13 +180,6 @@ export class QalmaEditorController {
     });
   }
 
-  setPlaceholder(placeholder: string): void {
-    this.placeholderState.set(placeholder);
-    this.editorView?.setProps({
-      attributes: this.createEditorAttributes(),
-    });
-  }
-
   focus(): void {
     this.editorView?.focus();
   }
@@ -230,8 +218,6 @@ export class QalmaEditorController {
   private createEditorAttributes(): Record<string, string> {
     return {
       'aria-label': 'Rich text editor',
-      'aria-placeholder': this.placeholder(),
-      'data-placeholder': this.placeholder(),
     };
   }
 }
