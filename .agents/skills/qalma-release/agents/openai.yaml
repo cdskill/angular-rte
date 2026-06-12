@@ -1,0 +1,4 @@
+interface:
+  display_name: 'Qalma Release'
+  short_description: 'Guide @qalma/editor versioning and the npm publish pipeline'
+  default_prompt: 'Help me cut a release of @qalma/editor.'

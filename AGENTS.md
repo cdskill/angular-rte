@@ -19,6 +19,9 @@ extension points over exposing raw ProseMirror details.
   behavior.
 - Use `git-commit` when the user invokes `/commit` or asks to generate and
   create a conventional commit from staged changes.
+- Use `qalma-release` when discussing or changing versioning, the release
+  scripts, the GitHub Actions release workflow, Nx release configuration, or
+  npm publishing for `@qalma/editor`.
 
 ## Architectural Invariants
 
