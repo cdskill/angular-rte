@@ -1,92 +1,118 @@
 ---
 name: docs-deployment
-description: Comment apps/docs est hébergé et déployé — SSG sur AWS S3 + CloudFront, infra OpenTofu/Terraform, et le workflow CI nx-affected. À lire avant toute question/modif sur l'hébergement de la doc, CloudFront, S3, le cache CDN, le domaine qalma.dev, la cert TLS, le rôle OIDC, ou le pipeline de déploiement de la doc. Évite de re-scanner le repo.
+description: How apps/docs is hosted and shipped — SSG on AWS S3 + CloudFront, OpenTofu/Terraform infrastructure, and the nx-affected CI deploy workflow. Read before any question or change about docs hosting, the SSG hosting model, CloudFront, S3, CDN caching, the qalma.dev domain, the ACM/TLS cert, the OIDC deploy role, or the docs deploy pipeline. Avoids re-scanning the repo. Infra/ops scope only — not app-level concerns.
 ---
 
 # docs-deployment
 
-`apps/docs` (site de doc de `@qalma/editor`) est un build **SSG** publié sur
-**AWS S3 + CloudFront**, déployé par le CI GitHub Actions. Pas de SSR, pas de
-serveur. Domaine : **`qalma.dev`** (apex).
+Infrastructure and delivery for `apps/docs` (the `@qalma/editor` docs site).
+This skill covers **hosting and deployment only** — not application code.
+
+## Hosting model: SSG (not SSR)
+
+`apps/docs` is built as **static site generation** — prerendered HTML + hashed
+assets, no Node server at runtime. Configured in `apps/docs/vite.config.ts` via
+the Analog plugin: `static: true` + `prerender` (routes + `discover`) + sitemap
+`host: 'https://qalma.dev/'`. Deployable output: **`dist/apps/docs/analog/public/`**.
+
+**Why SSG over SSR for the docs:**
+- Docs content only changes on redeploy → nothing to render per request.
+- SEO is identical to SSR (both ship fully-rendered HTML).
+- Better TTFB/FCP: prerendered HTML served from the CDN edge, no per-request compute.
+- Cheaper and zero ops: no server to run, scale or patch.
+
+**Why S3 + CloudFront over Amplify:** the build stays in the existing Nx CI
+(single source of truth, Nx cache) instead of Amplify's own build system, and we
+get full control of `Cache-Control` per path — the real lever for FCP/TTFB.
+Amplify runs CloudFront underneath anyway, so there is no CDN/perf loss.
+
+## Architecture
 
 ```
 GitHub Actions (nx affected → nx build docs)
-        │  assume role via OIDC (aucune clé stockée)
+        │  assumes IAM role via OIDC (no stored keys)
         ▼
-   S3 privé  ◀── OAC ──  CloudFront (edge, HTTP/3, Brotli)  ──▶  https://qalma.dev
-        ▲                          ▲
-   aws s3 sync              ACM cert (us-east-1) + Route 53 alias apex
+   private S3 bucket  ◀── OAC ──  CloudFront (edge, HTTP/3, Brotli)  ──▶  https://qalma.dev
+        ▲                                ▲
+   aws s3 sync                    ACM cert (us-east-1) + Route 53 apex alias
    + invalidation
 ```
 
-## Où vit quoi
+## Where things live
 
-- **Infra IaC** : `infra/terraform/` — `providers.tf` (AWS + alias `us_east_1`
-  pour la cert), `s3.tf`, `cloudfront.tf`, `dns_cert.tf` (zone Route 53 en
-  `data` + ACM + alias A/AAAA), `iam_oidc.tf`, `variables.tf`, `outputs.tf`,
-  `functions/rewrite.js`. Doc humaine : `infra/terraform/README.md`.
-- **CI** : `.github/workflows/deploy.yml`.
-- **Sortie SSG déployable** : `dist/apps/docs/analog/public/` (HTML + assets +
-  `sitemap.xml`, aucun serveur).
-- **App** : `apps/docs` — SSG (`static: true` + `prerender` dans `vite.config.ts`),
-  **zoneless** (`provideZonelessChangeDetection()` dans `app.config.ts`),
-  sitemap `host: 'https://qalma.dev/'`. Taggée `deploy:cloudfront` dans
-  `project.json`. Voir aussi [[docs-hosting]].
+- **IaC**: `infra/terraform/` — `providers.tf` (AWS + `us_east_1` alias for the
+  cert), `s3.tf`, `cloudfront.tf`, `dns_cert.tf` (Route 53 zone as `data` + ACM +
+  A/AAAA aliases), `iam_oidc.tf`, `variables.tf`, `outputs.tf`,
+  `functions/rewrite.js`. Human walkthrough: `infra/terraform/README.md`.
+- **CI**: `.github/workflows/deploy.yml`.
+- **Deployable artifact**: `dist/apps/docs/analog/public/`.
 
-## Mécanisme de déploiement (CI)
+## Infrastructure (Terraform/OpenTofu)
 
-Le workflow `deploy.yml` tourne sur push `main` (+ `workflow_dispatch`) :
+One `terraform apply` creates ~14 resources:
+- **S3**: private bucket (`block public access` on), bucket policy granting
+  read only to this CloudFront distribution via OAC. No website endpoint.
+- **CloudFront**: distribution with `http2and3`, `compress = true` (Brotli/gzip),
+  managed `CachingOptimized` policy, apex alias, `PriceClass_All` (global).
+  A CloudFront Function (`functions/rewrite.js`, viewer-request) maps clean URLs
+  to `…/index.html`; 403/404 `custom_error_response` → `/index.html` (SPA fallback).
+- **ACM**: DNS-validated cert in **us-east-1** (required for CloudFront).
+- **Route 53**: cert-validation records + apex `A`/`AAAA` aliases to CloudFront
+  (hosted zone must already exist; referenced as `data`).
+- **IAM/OIDC**: GitHub OIDC provider + least-privilege deploy role (S3 sync +
+  CloudFront invalidation only), trust scoped to
+  `repo:cdskill/angular-rte:ref:refs/heads/main`.
 
-1. Job `affected` : `nrwl/nx-set-shas` puis
-   `pnpm exec nx show projects --affected --type app -p tag:deploy:cloudfront --json`
-   → liste des apps **déployables réellement affectées**. Sort un matrix JSON.
-   Un push qui n'affecte pas `docs` ne déploie **rien**.
-2. Job `deploy` (matrice sur les apps affectées) : `nx build <app>`, puis un
-   `case "$app"` résout la config (dist dir, bucket, distribution, role) — pour
-   `docs` via les variables GitHub. Auth AWS par **OIDC** (pas de clé).
+## CI deploy mechanism
 
-**Ajouter une app déployable** = la tagger `deploy:cloudfront` + ajouter une
-branche dans le `case` de `deploy.yml` + créer ses ressources Terraform + ses
-variables GitHub.
+`deploy.yml` runs on push to `main` (+ `workflow_dispatch`):
+1. **`affected` job** — `nrwl/nx-set-shas`, then
+   `pnpm exec nx show projects --affected --type app -p tag:deploy:cloudfront --json`.
+   Emits a matrix of deployable apps the push actually affects. A push that does
+   not affect `docs` deploys nothing.
+2. **`deploy` job** (matrix per affected app) — `nx build <app>`, a `case "$app"`
+   resolves per-app config (dist dir, bucket, distribution, role) from GitHub
+   repo variables, then deploys. AWS auth via **OIDC** (no stored keys).
 
-## Stratégie de cache (le levier perf FCP/TTFB)
+Apps opt in to deployment with the **`deploy:cloudfront`** tag in `project.json`
+(`docs` has it). Add a deployable app = tag it + add a `case` branch in
+`deploy.yml` + its Terraform resources + its GitHub variables.
 
-Posée à l'upload, en 2 passes `aws s3 sync` :
-- Assets hashés (`*.js`, `*.css`) → `Cache-Control: public, max-age=31536000, immutable`
-  (avec `--delete` pour purger les anciens).
-- HTML + `*.xml` → `public, max-age=0, must-revalidate` (contenu frais à chaque deploy).
+## Cache strategy (the FCP/TTFB lever)
 
-Puis `aws cloudfront create-invalidation --paths "/*"` (1 chemin = gratuit
-jusqu'à 1000/mois). CloudFront : `compress = true` (Brotli/gzip), `http2and3`.
-La `functions/rewrite.js` (viewer-request) mappe les clean-URLs vers
-`…/index.html` ; `custom_error_response` 403/404 → `/index.html` (fallback SPA).
+Set at upload time, two `aws s3 sync` passes:
+- Hashed assets (`*.js`, `*.css`) → `Cache-Control: public, max-age=31536000, immutable`
+  (with `--delete` to prune removed files).
+- HTML + `*.xml` → `public, max-age=0, must-revalidate` (fresh content every deploy).
 
-## Identifiants live (NE PAS hardcoder ici — repo public)
+Then `aws cloudfront create-invalidation --paths "/*"` (one path = free up to
+1000/month). Result: returning visitors re-use immutable assets from edge+browser
+cache; HTML is always revalidated so deploys appear instantly.
 
-Domaine `qalma.dev`, région **`eu-west-1`**, `price_class = PriceClass_All`.
-Les valeurs concrètes (bucket, distribution id, role ARN, account id, domaine
-CloudFront) se lisent à la source, jamais en dur :
+## Live identifiers (do NOT hardcode here — public repo)
+
+Domain `qalma.dev`, region **`eu-west-1`**, `price_class = PriceClass_All`.
+Read concrete values from source, never inline:
 
 ```bash
-cd infra/terraform && tofu output      # bucket_name, distribution_id, deploy_role_arn, cloudfront_domain
-gh variable list --repo cdskill/angular-rte   # AWS_REGION, DOCS_S3_BUCKET, DOCS_CF_DISTRIBUTION_ID, DOCS_DEPLOY_ROLE_ARN
+cd infra/terraform && tofu output            # bucket_name, distribution_id, deploy_role_arn, cloudfront_domain
+gh variable list --repo cdskill/angular-rte  # AWS_REGION, DOCS_S3_BUCKET, DOCS_CF_DISTRIBUTION_ID, DOCS_DEPLOY_ROLE_ARN
 ```
 
 ## Runbook
 
-**Provisionner / modifier l'infra** (IaC) — outils :
-- Terraform n'est **plus dans homebrew-core** (licence BSL). On utilise
-  **OpenTofu** (OSS, drop-in) : `brew install opentofu`, commande **`tofu`**.
-  Les `.tf` sont identiques pour `terraform` et `tofu`.
-- `terraform.tfvars` (gitignoré) est prérempli pour `qalma.dev`.
+**Tooling**: Terraform is no longer in homebrew-core (BSL license). Use
+**OpenTofu** (OSS, drop-in): `brew install opentofu`, command **`tofu`**. The
+`.tf` files are identical for `terraform` and `tofu`. `terraform.tfvars`
+(gitignored) is pre-filled for `qalma.dev`.
 
 ```bash
 cd infra/terraform
-eval "$(aws configure export-credentials --format env)"   # ⚠️ voir gotcha creds
+eval "$(aws configure export-credentials --format env)"   # see gotcha below
 tofu init && tofu apply
 ```
 
-**Brancher/rafraîchir les variables GitHub** (gh est admin sur le repo) :
+**Wire/refresh GitHub variables** (gh is admin on the repo):
 ```bash
 R=cdskill/angular-rte
 gh variable set AWS_REGION              --repo "$R" --body "eu-west-1"
@@ -95,32 +121,31 @@ gh variable set DOCS_CF_DISTRIBUTION_ID --repo "$R" --body "$(tofu output -raw d
 gh variable set DOCS_DEPLOY_ROLE_ARN    --repo "$R" --body "$(tofu output -raw deploy_role_arn)"
 ```
 
-**Déployer** : merge sur `main` (si `docs` affecté) ou `gh workflow run deploy.yml`.
+**Deploy**: merge to `main` (when `docs` is affected) or `gh workflow run deploy.yml`.
 
-**Vérifier** :
+**Verify**:
 ```bash
 curl -I https://qalma.dev/             # 200, content-encoding: br
 curl -I https://qalma.dev/sitemap.xml  # 200
 ```
 
-## Gotchas (réellement rencontrés)
+## Gotchas (actually hit)
 
-- **Creds AWS introuvables par OpenTofu** alors que le CLI `aws` marche : les
-  creds étaient dans `~/.aws/login` (type `login`, non-standard), invisible pour
-  le SDK Go. Fix : `eval "$(aws configure export-credentials --format env)"`
-  avant `tofu apply` (exporte les creds courants en variables d'env).
-- **`brew install terraform` échoue** (retiré de homebrew-core) → OpenTofu.
-- **zoneless est requis** : zone.js n'est pas installé ; sans
-  `provideZonelessChangeDetection()` l'app ne bootstrappe pas côté client.
-- **Coût** : ~0 € (palier gratuit permanent CloudFront 1 To + 10M req/mois).
-  Seul coût standing = la hosted zone Route 53 (0,50 $/mois), déjà payée.
-- **Sécurité** : pas de clé AWS stockée — OIDC verrouillé sur
-  `repo:cdskill/angular-rte:ref:refs/heads/main`. Le dossier `infra/` ne contient
-  aucun secret ; `terraform.tfstate` et `terraform.tfvars` sont gitignorés.
+- **OpenTofu can't find AWS creds** while the `aws` CLI works: creds lived in
+  `~/.aws/login` (type `login`, non-standard), invisible to the Go SDK. Fix:
+  `eval "$(aws configure export-credentials --format env)"` before `tofu apply`.
+- **`brew install terraform` fails** (removed from homebrew-core) → use OpenTofu.
+- **Cost ≈ €0** under CloudFront's always-free tier (1 TB + 10M req/month). Only
+  standing AWS cost is the Route 53 hosted zone ($0.50/mo), already paid.
+- **Security**: no AWS keys stored anywhere — OIDC, branch-scoped trust. `infra/`
+  holds no secrets; `terraform.tfstate` and `terraform.tfvars` are gitignored.
 
-## État au 2026-06-13
+## Status (2026-06-13)
 
-- Infra **appliquée** (14 ressources live), variables GitHub **branchées**.
-- **PR #4** (`feat/docs-deploy-cloudfront`) **ouverte, pas encore mergée** → le
-  premier déploiement se déclenchera au merge (qui affecte `docs`). Tant que ce
-  n'est pas mergé + déployé, le bucket est vide et `qalma.dev` renvoie une erreur.
+Infra **applied** (14 resources live), GitHub variables **wired**. PR
+`feat/docs-deploy-cloudfront` (#4) is **open, not yet merged** → the first deploy
+fires on merge (which affects `docs`). Until merged + deployed the bucket is
+empty and `qalma.dev` returns an error.
+
+Related: [[docs-hosting]] (memory), and the deploy workflow lives next to the
+npm `release.yml`.
