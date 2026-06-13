@@ -1,0 +1,122 @@
+name: Deploy
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+# OIDC: request a short-lived token to assume the AWS deploy role (no stored keys).
+permissions:
+  id-token: write
+  contents: read
+
+concurrency:
+  group: deploy-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # 1) Work out which *deployable* apps the push actually affects, using the Nx
+  #    project graph (not crude path globs). Apps opt in via the
+  #    `deploy:cloudfront` tag in their project.json.
+  affected:
+    name: Resolve affected deployable apps
+    runs-on: ubuntu-latest
+    outputs:
+      apps: ${{ steps.resolve.outputs.apps }}
+      any: ${{ steps.resolve.outputs.any }}
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.23.0
+          run_install: false
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '24.x'
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+
+      # Computes NX_BASE / NX_HEAD (last successful deploy → current SHA).
+      - uses: nrwl/nx-set-shas@v4
+
+      - id: resolve
+        shell: bash
+        run: |
+          APPS=$(pnpm exec nx show projects --affected --type app -p tag:deploy:cloudfront --json | tail -n1)
+          [ -z "$APPS" ] && APPS="[]"
+          echo "apps=$APPS" >> "$GITHUB_OUTPUT"
+          if [ "$APPS" = "[]" ]; then
+            echo "any=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "any=true" >> "$GITHUB_OUTPUT"
+          fi
+          echo "Affected deployable apps: $APPS"
+
+  # 2) One matrix leg per affected deployable app. Today that's `docs`; adding a
+  #    new app = tag it `deploy:cloudfront` + add a case branch below + its vars.
+  deploy:
+    name: Deploy ${{ matrix.app }}
+    needs: affected
+    if: needs.affected.outputs.any == 'true'
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        app: ${{ fromJson(needs.affected.outputs.apps) }}
+    steps:
+      - uses: actions/checkout@v6
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.23.0
+          run_install: false
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '24.x'
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+
+      - name: Build ${{ matrix.app }}
+        run: pnpm nx build ${{ matrix.app }}
+
+      - name: Resolve deploy target
+        id: cfg
+        shell: bash
+        run: |
+          case "${{ matrix.app }}" in
+            docs)
+              echo "dist=dist/apps/docs/analog/public" >> "$GITHUB_OUTPUT"
+              echo "bucket=${{ vars.DOCS_S3_BUCKET }}" >> "$GITHUB_OUTPUT"
+              echo "distribution=${{ vars.DOCS_CF_DISTRIBUTION_ID }}" >> "$GITHUB_OUTPUT"
+              echo "role=${{ vars.DOCS_DEPLOY_ROLE_ARN }}" >> "$GITHUB_OUTPUT"
+              ;;
+            *)
+              echo "::error::No deploy config for '${{ matrix.app }}'"; exit 1 ;;
+          esac
+
+      - name: Configure AWS credentials (OIDC)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ steps.cfg.outputs.role }}
+          aws-region: ${{ vars.AWS_REGION }}
+
+      # Pass 1 — hashed, content-addressed assets: cache forever, prune removed.
+      - name: Upload immutable assets
+        run: |
+          aws s3 sync "${{ steps.cfg.outputs.dist }}" "s3://${{ steps.cfg.outputs.bucket }}" \
+            --delete --exclude "*.html" --exclude "*.xml" \
+            --cache-control "public, max-age=31536000, immutable"
+
+      # Pass 2 — HTML + sitemap: always revalidate so deploys show up instantly.
+      - name: Upload HTML + sitemap (revalidate)
+        run: |
+          aws s3 sync "${{ steps.cfg.outputs.dist }}" "s3://${{ steps.cfg.outputs.bucket }}" \
+            --exclude "*" --include "*.html" --include "*.xml" \
+            --cache-control "public, max-age=0, must-revalidate"
+
+      # "/*" = one invalidation path (free up to 1000/month), fresh HTML at every edge.
+      - name: Invalidate CloudFront
+        run: |
+          aws cloudfront create-invalidation \
+            --distribution-id "${{ steps.cfg.outputs.distribution }}" --paths "/*"

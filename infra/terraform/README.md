@@ -65,16 +65,20 @@ gh variable set DOCS_DEPLOY_ROLE_ARN     --body "$(terraform output -raw deploy_
 
 ## 3. Deploy
 
-The [`deploy-docs`](../../.github/workflows/deploy-docs.yml) workflow runs on every
-push to `main` that touches `apps/docs/**` or `libs/editor/**`, and can be triggered
-manually:
+The [`deploy`](../../.github/workflows/deploy.yml) workflow runs on every push to
+`main`. It uses the **Nx project graph** (`nx affected`) to decide which deployable
+apps actually changed — only apps tagged `deploy:cloudfront` in their `project.json`
+are candidates, and each runs as its own matrix leg. A push that doesn't affect
+`docs` deploys nothing.
+
+Trigger manually if needed:
 
 ```bash
-gh workflow run deploy-docs.yml
+gh workflow run deploy.yml
 ```
 
-It builds the SSG output, syncs it to S3 with the per-type cache headers above,
-and invalidates CloudFront.
+Each affected app builds, syncs to its S3 bucket with the per-type cache headers
+above, and invalidates its CloudFront distribution.
 
 ## 4. Verify
 
