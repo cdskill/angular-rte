@@ -1,3 +1,11 @@
+## 0.0.1-alpha.2 (2026-06-13)
+
+### 🚀 Features
+
+- **docs:** add S3+CloudFront infra (Terraform) and CI deploy workflow ([6728e57](https://github.com/cdskill/qalma/commit/6728e57))
+- **docs:** enable zoneless change detection + register Angular CLI MCP ([3290508](https://github.com/cdskill/qalma/commit/3290508))
+- **docs:** add Analog docs app in SSG mode + sync-doc skill ([1a3e579](https://github.com/cdskill/qalma/commit/1a3e579))
+
 ## 0.0.1-alpha.1 (2026-06-12)
 
 ### 🚀 Features
