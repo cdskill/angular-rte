@@ -90,6 +90,9 @@ jobs:
               echo "bucket=${{ vars.DOCS_S3_BUCKET }}" >> "$GITHUB_OUTPUT"
               echo "distribution=${{ vars.DOCS_CF_DISTRIBUTION_ID }}" >> "$GITHUB_OUTPUT"
               echo "role=${{ vars.DOCS_DEPLOY_ROLE_ARN }}" >> "$GITHUB_OUTPUT"
+              # IndexNow: public domain + key (key file lives at apps/docs/public/<key>.txt).
+              echo "host=qalma.dev" >> "$GITHUB_OUTPUT"
+              echo "indexnow_key=57ae097f37a81fa242039798bfdb3226" >> "$GITHUB_OUTPUT"
               ;;
             *)
               echo "::error::No deploy config for '${{ matrix.app }}'"; exit 1 ;;
@@ -102,17 +105,19 @@ jobs:
           aws-region: ${{ vars.AWS_REGION }}
 
       # Pass 1 — hashed, content-addressed assets: cache forever, prune removed.
+      # .txt (robots.txt, IndexNow key) is excluded so it isn't pinned immutable for a year.
       - name: Upload immutable assets
         run: |
           aws s3 sync "${{ steps.cfg.outputs.dist }}" "s3://${{ steps.cfg.outputs.bucket }}" \
-            --delete --exclude "*.html" --exclude "*.xml" \
+            --delete --exclude "*.html" --exclude "*.xml" --exclude "*.txt" \
             --cache-control "public, max-age=31536000, immutable"
 
-      # Pass 2 — HTML + sitemap: always revalidate so deploys show up instantly.
-      - name: Upload HTML + sitemap (revalidate)
+      # Pass 2 — HTML, sitemap, robots.txt + IndexNow key: always revalidate so
+      # deploys show up instantly.
+      - name: Upload HTML, sitemap, txt (revalidate)
         run: |
           aws s3 sync "${{ steps.cfg.outputs.dist }}" "s3://${{ steps.cfg.outputs.bucket }}" \
-            --exclude "*" --include "*.html" --include "*.xml" \
+            --exclude "*" --include "*.html" --include "*.xml" --include "*.txt" \
             --cache-control "public, max-age=0, must-revalidate"
 
       # "/*" = one invalidation path (free up to 1000/month), fresh HTML at every edge.
@@ -120,3 +125,35 @@ jobs:
         run: |
           aws cloudfront create-invalidation \
             --distribution-id "${{ steps.cfg.outputs.distribution }}" --paths "/*"
+
+      # Tell IndexNow (Bing, Yandex, Seznam…; Google is trialing it) about the current
+      # pages so they get crawled in minutes, not days. URLs come from the freshly built
+      # sitemap. Non-blocking — a failed ping never fails the deploy. Skipped for apps
+      # that don't set an IndexNow `host` in the case above.
+      - name: Ping IndexNow
+        if: steps.cfg.outputs.host != ''
+        shell: bash
+        run: |
+          host="${{ steps.cfg.outputs.host }}"
+          key="${{ steps.cfg.outputs.indexnow_key }}"
+          sitemap="${{ steps.cfg.outputs.dist }}/sitemap.xml"
+          url_json=$(grep -oE '<loc>[^<]+</loc>' "$sitemap" | sed -E 's#</?loc>##g' | jq -R . | jq -s 'map(select(length > 0))')
+          count=$(echo "$url_json" | jq 'length')
+          if [ "$count" -eq 0 ]; then
+            echo "IndexNow: no URLs found in $sitemap, skipping."
+            exit 0
+          fi
+          payload=$(jq -n \
+            --arg host "$host" \
+            --arg key "$key" \
+            --arg keyLocation "https://$host/$key.txt" \
+            --argjson urlList "$url_json" \
+            '{host: $host, key: $key, keyLocation: $keyLocation, urlList: $urlList}')
+          code=$(curl -sS -o /dev/null -w '%{http_code}' -X POST 'https://api.indexnow.org/indexnow' \
+            -H 'Content-Type: application/json; charset=utf-8' \
+            -d "$payload")
+          echo "IndexNow → HTTP $code for $count URL(s)"
+          case "$code" in
+            200|202) ;;
+            *) echo "::warning::IndexNow ping returned $code (non-blocking)" ;;
+          esac

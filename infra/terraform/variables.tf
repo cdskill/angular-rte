@@ -14,6 +14,12 @@ variable "route53_zone_name" {
   type        = string
 }
 
+variable "google_site_verification" {
+  description = "Google Search Console domain-property TXT verification token (the full 'google-site-verification=...' string). Empty = no record created."
+  type        = string
+  default     = ""
+}
+
 variable "github_repo" {
   description = "owner/repo allowed to assume the deploy role via GitHub OIDC."
   type        = string

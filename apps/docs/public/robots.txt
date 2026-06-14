@@ -1,0 +1,7 @@
+# https://qalma.dev/robots.txt
+# Allow everything, including AI crawlers (GPTBot, ClaudeBot, PerplexityBot, …)
+# so the docs can be cited in AI answers — see GEO / AI-visibility goal.
+User-agent: *
+Allow: /
+
+Sitemap: https://qalma.dev/sitemap.xml

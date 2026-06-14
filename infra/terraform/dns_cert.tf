@@ -63,3 +63,17 @@ resource "aws_route53_record" "aaaa" {
     evaluate_target_health = false
   }
 }
+
+# Google Search Console — domain-property ownership (apex TXT).
+# Route 53 stores every TXT value for a name as ONE record set: any future apex
+# TXT (SPF, other site verifications) must be ADDED to this resource's `records`
+# list, not declared as a separate aws_route53_record (that would conflict).
+resource "aws_route53_record" "google_site_verification" {
+  count = var.google_site_verification != "" ? 1 : 0
+
+  zone_id = data.aws_route53_zone.this.zone_id
+  name    = var.domain_name
+  type    = "TXT"
+  records = [var.google_site_verification]
+  ttl     = 300
+}
