@@ -73,7 +73,6 @@ import { PosthogService } from '../services/posthog.service';
           <button
             type="button"
             class="hidden h-9 items-center gap-2 rounded-md border border-border bg-card px-3 text-xs text-muted-foreground transition-colors hover:bg-secondary sm:inline-flex"
-            aria-label="Search documentation"
           >
             <ng-icon name="lucideSearch" class="text-sm" aria-hidden="true" />
             <span>Search docs…</span>
