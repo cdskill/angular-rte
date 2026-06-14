@@ -4,6 +4,7 @@ import {
   Component,
   ElementRef,
   HostListener,
+  inject,
   output,
   signal,
   viewChild,
@@ -13,6 +14,7 @@ import { NgIcon, provideIcons } from '@ng-icons/core';
 import { lucideMouse } from '@ng-icons/lucide';
 
 import { DOCS_NAV } from './docs-nav';
+import { PosthogService } from '../services/posthog.service';
 
 /**
  * Left-nav for the docs site. Plain grouped link list (no collapsible
@@ -47,7 +49,7 @@ import { DOCS_NAV } from './docs-nav';
                   [routerLink]="item.href"
                   routerLinkActive="bg-accent-subtle !text-accent font-medium"
                   [routerLinkActiveOptions]="{ exact: true }"
-                  (click)="linkClick.emit()"
+                  (click)="onLinkClick(item.title, item.href)"
                   class="block rounded-md px-2 py-1 text-xs text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
                 >
                   {{ item.title }}
@@ -78,9 +80,12 @@ import { DOCS_NAV } from './docs-nav';
   `,
 })
 export class DocsSidebar implements AfterViewInit {
+  private readonly posthogService = inject(PosthogService);
+
   protected readonly groups = DOCS_NAV;
 
-  private readonly scrollEl = viewChild.required<ElementRef<HTMLElement>>('scrollEl');
+  private readonly scrollEl =
+    viewChild.required<ElementRef<HTMLElement>>('scrollEl');
 
   protected readonly showTopFade = signal(false);
   protected readonly showBottomFade = signal(false);
@@ -97,6 +102,16 @@ export class DocsSidebar implements AfterViewInit {
     const el = this.scrollEl().nativeElement;
 
     this.showTopFade.set(el.scrollTop > 4);
-    this.showBottomFade.set(el.scrollTop + el.clientHeight < el.scrollHeight - 4);
+    this.showBottomFade.set(
+      el.scrollTop + el.clientHeight < el.scrollHeight - 4,
+    );
+  }
+
+  protected onLinkClick(title: string, href: string): void {
+    this.linkClick.emit();
+    this.posthogService.posthog.capture('docs_sidebar_clicked', {
+      title,
+      href,
+    });
   }
 }

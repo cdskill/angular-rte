@@ -19,7 +19,9 @@
   "private": true,
   "packageManager": "pnpm@10.23.0",
   "pnpm": {
-    "onlyBuiltDependencies": ["esbuild"]
+    "onlyBuiltDependencies": [
+      "esbuild"
+    ]
   },
   "dependencies": {
     "@analogjs/content": "^2.6.1",
@@ -45,6 +47,7 @@
     "marked-highlight": "^2.2.1",
     "marked-mangle": "^1.1.10",
     "mermaid": "^10.2.4",
+    "posthog-js": "^1.386.6",
     "prismjs": "^1.29.0",
     "prosemirror-commands": "^1.7.1",
     "prosemirror-history": "^1.5.0",

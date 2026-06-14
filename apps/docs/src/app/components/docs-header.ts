@@ -1,4 +1,9 @@
-import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  inject,
+  signal,
+} from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { NgIcon, provideIcons } from '@ng-icons/core';
 import {
@@ -11,6 +16,7 @@ import {
 
 import { HlmButton } from '../ui/button';
 import { ThemeToggle } from './theme-toggle';
+import { PosthogService } from '../services/posthog.service';
 
 /**
  * Minimal top bar in the shadcn / plate spirit: short height, no dividing
@@ -21,11 +27,19 @@ import { ThemeToggle } from './theme-toggle';
   selector: 'app-docs-header',
   imports: [RouterLink, RouterLinkActive, NgIcon, HlmButton, ThemeToggle],
   providers: [
-    provideIcons({ lucideFeather, lucideGithub, lucideMenu, lucideSearch, lucideX }),
+    provideIcons({
+      lucideFeather,
+      lucideGithub,
+      lucideMenu,
+      lucideSearch,
+      lucideX,
+    }),
   ],
   template: `
     <header class="sticky top-0 z-40 w-full bg-background/70 backdrop-blur-md">
-      <div class="relative mx-auto flex h-14 max-w-6xl items-center gap-6 px-4 sm:px-6">
+      <div
+        class="relative mx-auto flex h-14 max-w-6xl items-center gap-6 px-4 sm:px-6"
+      >
         <a href="/" class="flex items-center gap-2" aria-label="Qalma home">
           <ng-icon
             name="lucideFeather"
@@ -40,7 +54,10 @@ import { ThemeToggle } from './theme-toggle';
         <nav
           class="hidden items-center gap-5 text-sm text-muted-foreground md:flex"
         >
-          <a class="transition-colors hover:text-foreground" href="/#playground">
+          <a
+            class="transition-colors hover:text-foreground"
+            href="/#playground"
+          >
             Playground
           </a>
           <a
@@ -75,6 +92,7 @@ import { ThemeToggle } from './theme-toggle';
             target="_blank"
             rel="noreferrer"
             aria-label="GitHub repository"
+            (click)="trackGithubClick()"
           >
             <ng-icon name="lucideGithub" aria-hidden="true" />
           </a>
@@ -89,7 +107,7 @@ import { ThemeToggle } from './theme-toggle';
             class="md:hidden"
             [attr.aria-label]="mobileNavOpen() ? 'Close menu' : 'Open menu'"
             [attr.aria-expanded]="mobileNavOpen()"
-            (click)="mobileNavOpen.set(!mobileNavOpen())"
+            (click)="toggleMobileNav()"
           >
             <ng-icon
               [name]="mobileNavOpen() ? 'lucideX' : 'lucideMenu'"
@@ -124,5 +142,19 @@ import { ThemeToggle } from './theme-toggle';
   `,
 })
 export class DocsHeader {
+  private readonly posthogService = inject(PosthogService);
+
   protected readonly mobileNavOpen = signal(false);
+
+  protected toggleMobileNav(): void {
+    const opening = !this.mobileNavOpen();
+    this.mobileNavOpen.set(opening);
+    if (opening) {
+      this.posthogService.posthog.capture('mobile_nav_opened');
+    }
+  }
+
+  protected trackGithubClick(): void {
+    this.posthogService.posthog.capture('github_link_clicked');
+  }
 }

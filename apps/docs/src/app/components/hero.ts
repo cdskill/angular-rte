@@ -1,6 +1,7 @@
 import {
   ChangeDetectionStrategy,
   Component,
+  inject,
   signal,
 } from '@angular/core';
 import { NgIcon, provideIcons } from '@ng-icons/core';
@@ -12,6 +13,7 @@ import {
 } from '@ng-icons/lucide';
 
 import { HlmButton } from '../ui/button';
+import { PosthogService } from '../services/posthog.service';
 
 const INSTALL_COMMAND = 'pnpm add @qalma/editor';
 
@@ -28,7 +30,9 @@ const INSTALL_COMMAND = 'pnpm add @qalma/editor';
     provideIcons({ lucideArrowRight, lucideCheck, lucideCopy, lucideSparkles }),
   ],
   template: `
-    <section class="mx-auto max-w-3xl px-4 pb-10 pt-12 text-center sm:pb-12 sm:pt-16">
+    <section
+      class="mx-auto max-w-3xl px-4 pb-10 pt-12 text-center sm:pb-12 sm:pt-16"
+    >
       <span
         class="mb-5 inline-flex items-center gap-1.5 rounded-full border border-border bg-card px-3 py-1 text-xs font-medium text-muted-foreground"
       >
@@ -60,13 +64,15 @@ const INSTALL_COMMAND = 'pnpm add @qalma/editor';
         crafted for Angular.
       </h1>
 
-      <p class="mx-auto mt-5 max-w-xl text-base leading-relaxed text-muted-foreground">
+      <p
+        class="mx-auto mt-5 max-w-xl text-base leading-relaxed text-muted-foreground"
+      >
         A headless, plugin-based editor built on ProseMirror. Composable
         primitives, Tailwind-first styling, and zero opinions about your design.
       </p>
 
       <div class="mt-7 flex flex-wrap items-center justify-center gap-3">
-        <a appBtn size="lg" href="#playground">
+        <a appBtn size="lg" href="#playground" (click)="trackGetStarted()">
           Get started
           <ng-icon name="lucideArrowRight" aria-hidden="true" />
         </a>
@@ -80,7 +86,11 @@ const INSTALL_COMMAND = 'pnpm add @qalma/editor';
         >
           {{ installCommand }}
           @if (copied()) {
-            <ng-icon name="lucideCheck" class="text-accent" aria-hidden="true" />
+            <ng-icon
+              name="lucideCheck"
+              class="text-accent"
+              aria-hidden="true"
+            />
           } @else {
             <ng-icon name="lucideCopy" aria-hidden="true" />
           }
@@ -90,6 +100,8 @@ const INSTALL_COMMAND = 'pnpm add @qalma/editor';
   `,
 })
 export class Hero {
+  private readonly posthogService = inject(PosthogService);
+
   protected readonly installCommand = INSTALL_COMMAND;
   protected readonly copied = signal(false);
 
@@ -98,5 +110,13 @@ export class Hero {
       this.copied.set(true);
       setTimeout(() => this.copied.set(false), 1400);
     });
+
+    this.posthogService.posthog.capture('install_command_copied', {
+      command: INSTALL_COMMAND,
+    });
+  }
+
+  protected trackGetStarted(): void {
+    this.posthogService.posthog.capture('get_started_clicked');
   }
 }

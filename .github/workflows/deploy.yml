@@ -79,6 +79,10 @@ jobs:
 
       - name: Build ${{ matrix.app }}
         run: pnpm nx build ${{ matrix.app }}
+        # PostHog (docs) reads VITE_* at build time. Public project key → repo variables, not secrets.
+        env:
+          VITE_POSTHOG_KEY: ${{ vars.POSTHOG_KEY }}
+          VITE_POSTHOG_HOST: ${{ vars.POSTHOG_HOST }}
 
       - name: Resolve deploy target
         id: cfg

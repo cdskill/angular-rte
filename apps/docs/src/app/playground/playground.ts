@@ -45,12 +45,15 @@ import {
 } from './image';
 import { LinkPopoverController } from './link-popover-controller';
 import { PlaygroundLinkPopover } from './link-popover';
+import { LinkPopover } from './link-popover.model';
 import {
   PlaygroundMentionController,
+  PlaygroundMentionOption,
   createPlaygroundMentionSource,
 } from './mention';
 import { PlaygroundMentionMenu } from './mention-menu';
 import { PlaygroundToolbar } from './toolbar';
+import { PosthogService } from '../services/posthog.service';
 
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -103,7 +106,7 @@ import { PlaygroundToolbar } from './toolbar';
         [loading]="mentionController.loading()"
         [activeIndex]="mentionController.activeIndex()"
         (activate)="mentionController.setActiveIndex($event)"
-        (pick)="mentionController.insert($event)"
+        (pick)="onMentionPick($event)"
         (dismiss)="mentionController.hide()"
       />
     }
@@ -113,7 +116,7 @@ import { PlaygroundToolbar } from './toolbar';
       [href]="linkPopover.href()"
       (hrefChange)="linkPopover.href.set($event)"
       (edit)="linkPopover.edit($event)"
-      (save)="linkPopover.save($event)"
+      (save)="onLinkSave($event)"
       (remove)="linkPopover.remove($event)"
       (dismiss)="linkPopover.hide()"
       (keepOpen)="linkPopover.keepOpen()"
@@ -135,6 +138,7 @@ import { PlaygroundToolbar } from './toolbar';
 })
 export class Playground {
   private readonly destroyRef = inject(DestroyRef);
+  private readonly posthogService = inject(PosthogService);
   // `#mentionSurface` sits on the <qalma-content> component, so without an
   // explicit `read` the query resolves to the component instance (whose
   // `.nativeElement` is undefined). Read the host ElementRef instead.
@@ -238,6 +242,10 @@ export class Playground {
       currentImage ? 'updateImage' : 'insertImage',
       commandValue,
     );
+
+    this.posthogService.posthog.capture('playground_image_inserted', {
+      type: 'url',
+    });
   }
 
   protected chooseImageFile(): void {
@@ -269,6 +277,20 @@ export class Playground {
       title: file.name,
       previewSrc,
     });
+
+    this.posthogService.posthog.capture('playground_image_uploaded', {
+      mime_type: file.type,
+    });
+  }
+
+  protected onLinkSave(popover: LinkPopover): void {
+    this.linkPopover.save(popover);
+    this.posthogService.posthog.capture('playground_link_saved');
+  }
+
+  protected onMentionPick(option: PlaygroundMentionOption): void {
+    this.mentionController.insert(option);
+    this.posthogService.posthog.capture('playground_mention_inserted');
   }
 
   private revokeImagePreviewUrls(): void {

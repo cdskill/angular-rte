@@ -2,12 +2,14 @@ import {
   ChangeDetectionStrategy,
   Component,
   afterNextRender,
+  inject,
   signal,
 } from '@angular/core';
 import { NgIcon, provideIcons } from '@ng-icons/core';
 import { lucideMoon, lucideSun } from '@ng-icons/lucide';
 
 import { HlmButton } from '../ui/button';
+import { PosthogService } from '../services/posthog.service';
 
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -21,7 +23,9 @@ import { HlmButton } from '../ui/button';
       size="icon"
       type="button"
       (click)="toggle()"
-      [attr.aria-label]="isDark() ? 'Switch to light theme' : 'Switch to dark theme'"
+      [attr.aria-label]="
+        isDark() ? 'Switch to light theme' : 'Switch to dark theme'
+      "
       title="Toggle theme"
     >
       @if (isDark()) {
@@ -33,6 +37,8 @@ import { HlmButton } from '../ui/button';
   `,
 })
 export class ThemeToggle {
+  private readonly posthogService = inject(PosthogService);
+
   protected readonly isDark = signal(false);
 
   constructor() {
@@ -54,5 +60,9 @@ export class ThemeToggle {
     }
 
     this.isDark.set(next);
+
+    this.posthogService.posthog.capture('theme_toggled', {
+      theme: next ? 'dark' : 'light',
+    });
   }
 }
