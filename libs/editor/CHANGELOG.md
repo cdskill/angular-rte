@@ -1,3 +1,11 @@
+## 0.0.1-alpha.3 (2026-06-14)
+
+### 🚀 Features
+
+- **editor:** add slash command plugin ([1bdbbac](https://github.com/cdskill/qalma/commit/1bdbbac))
+- **docs:** cookieless PostHog analytics (SSR-safe) ([a028094](https://github.com/cdskill/qalma/commit/a028094))
+- **seo:** GSC verification, robots.txt, IndexNow on deploy ([f0b2686](https://github.com/cdskill/qalma/commit/f0b2686))
+
 ## 0.0.1-alpha.2 (2026-06-13)
 
 ### 🚀 Features
