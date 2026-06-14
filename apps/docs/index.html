@@ -2,13 +2,52 @@
 <html lang="en" class="">
   <head>
     <meta charset="utf-8" />
-    <title>Qalma — Headless rich text editing for Angular</title>
+    <title>Qalma — Headless Angular Rich Text Editor</title>
     <base href="/" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta
       name="description"
       content="Qalma is a headless, plugin-based rich text editor for Angular, built on ProseMirror. Composable primitives, Tailwind-first styling, your art direction."
     />
+
+    <!-- Canonical + social. Per-page og:url/og:title/og:description and the
+         canonical href are overridden at (pre)render time by SeoTitleStrategy. -->
+    <link rel="canonical" href="https://qalma.dev/" />
+    <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#0a0a0a" media="(prefers-color-scheme: dark)" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Qalma" />
+    <meta property="og:url" content="https://qalma.dev/" />
+    <meta property="og:title" content="Qalma — Headless Angular Rich Text Editor" />
+    <meta
+      property="og:description"
+      content="A headless, plugin-based rich text editor for Angular, built on ProseMirror. Composable primitives, Tailwind-first styling, your art direction."
+    />
+    <meta property="og:image" content="https://qalma.dev/qalma-mark-light.svg" />
+    <meta property="og:image:alt" content="Qalma" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Qalma — Headless Angular Rich Text Editor" />
+    <meta
+      name="twitter:description"
+      content="A headless, plugin-based rich text editor for Angular, built on ProseMirror."
+    />
+    <meta name="twitter:image" content="https://qalma.dev/qalma-mark-light.svg" />
+
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "SoftwareApplication",
+        "name": "Qalma",
+        "applicationCategory": "DeveloperApplication",
+        "operatingSystem": "Web",
+        "description": "A headless, plugin-based rich text editor for Angular, built on ProseMirror.",
+        "url": "https://qalma.dev/",
+        "softwareRequirements": "Angular",
+        "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" }
+      }
+    </script>
+
     <link
       rel="icon"
       type="image/svg+xml"
